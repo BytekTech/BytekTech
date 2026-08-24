@@ -1,59 +1,71 @@
-# Client
+<div align="center">
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
+# Bytek Technology
 
-## Development server
+**Custom software engineering, from idea to production.**
 
-To start a local development server, run:
+[bytektechnology.com](https://bytektechnology.com) &nbsp;·&nbsp; [bytektechnology@gmail.com](mailto:bytektechnology@gmail.com) &nbsp;·&nbsp; [@bytek_ar](https://www.instagram.com/bytek_ar)
 
-```bash
-ng serve
-```
+</div>
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+We partner with companies from idea to production: digital products, web platforms and internal systems that work. We do not sell hours — we deliver working software.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
 
-```bash
-ng generate component component-name
-```
+## What we build
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Four fronts that combine according to what your operation needs.
 
-```bash
-ng generate --help
-```
+### Web applications and platforms
+Products that carry real operations: management panels, customer portals and transactional platforms, with performance and security handled from day one.
+`Role-based access` · `Available 24/7` · `Grows with your operation`
 
-## Building
+### Custom digital products
+From idea to a live MVP. We define scope with you, design the experience and ship something usable early, so you validate with users instead of assumptions.
+`Fixed scope and price` · `A usable first release` · `Validated with real users`
 
-To build the project run:
+### Internal systems and integrations
+We automate what lives in spreadsheets today and connect the tools you already use: ERP, invoicing, CRM and third-party services talking to each other.
+`Less manual work` · `Connected to your tools` · `Your history comes along`
 
-```bash
-ng build
-```
+### Cloud, data and infrastructure
+Infrastructure that scales without billing surprises, with metrics in plain sight: monitoring, alerts and dashboards so you decide on data, not intuition.
+`Predictable costs` · `We find out before your client` · `Dashboards to decide with`
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## How we work
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Four stages, no fine print. You know from the start what you get, when, and what it costs.
 
-```bash
-ng test
-```
+| # | Stage | What happens | Terms |
+|---|---|---|---|
+| 1 | **First meeting** | You tell us what you need and what constraints you have. We leave with the problem understood and a clear idea of where to start. | Free of charge |
+| 2 | **Proposal** | We send you scope, timeline and a fixed budget per stage. No open-ended hours, no surprises halfway through. | Fixed budget |
+| 3 | **MVP in production** | We build the smallest version that solves the problem and put it live, with partial releases you can see and try. | 6 to 10 weeks |
+| 4 | **Evolution and support** | The product keeps growing on real usage data. Maintenance, improvements and new features on a codebase we already know. | Ongoing plan |
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## Good to know
 
-```bash
-ng e2e
-```
+- **We work 100% remotely**, in English and Spanish, with international clients.
+- **Fixed budget per stage**, defined after the first meeting based on the scope.
+- **A typical MVP takes 6 to 10 weeks**, depending on scope.
+- **Support does not end at launch**: we offer maintenance plans and continuous product evolution.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## Start a project
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Tell us about your project. **We reply within 48 business hours with concrete next steps.**
+
+| | |
+|---|---|
+| Email | [bytektechnology@gmail.com](mailto:bytektechnology@gmail.com) |
+| Website | [bytektechnology.com](https://bytektechnology.com) |
+| Instagram | [@bytek_ar](https://www.instagram.com/bytek_ar) |
+
+No strings attached · English or Spanish

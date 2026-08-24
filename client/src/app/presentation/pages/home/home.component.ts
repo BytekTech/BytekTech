@@ -25,9 +25,9 @@ import {
   typewriterText,
 } from './typewriter';
 
-const FRAME_MS = 28;
+const FRAME_MS = 45;
 /** El remate espera a que el título termine de decodificarse. */
-const ACCENT_DELAY_MS = 420;
+const ACCENT_DELAY_MS = 620;
 
 @Component({
   selector: 'app-home',

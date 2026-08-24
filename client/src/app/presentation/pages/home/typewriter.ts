@@ -10,11 +10,11 @@ export interface TypewriterState {
 
 export const TYPEWRITER_START: TypewriterState = { phrase: 0, length: 0, phase: 'typing' };
 
-const TYPE_MS = 85;
-const DELETE_MS = 45;
-const HOLD_MS = 1900;
+const TYPE_MS = 120;
+const DELETE_MS = 60;
+const HOLD_MS = 2200;
 /** Respiro entre borrar del todo y empezar la frase siguiente. */
-const SWITCH_MS = 320;
+const SWITCH_MS = 400;
 
 /**
  * Avanza un paso el ciclo de escritura: escribe la frase carácter a carácter,

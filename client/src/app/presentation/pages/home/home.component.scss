@@ -66,26 +66,32 @@
   letter-spacing: -0.03em;
   color: var(--ink);
 
-  // El hueco del remate mide siempre lo que el remate más largo: así el título
-  // no se reacomoda con cada letra que se escribe o se borra.
+  /*
+   * El remate ocupa su propio renglón y su hueco reserva el ALTO del remate
+   * más largo, no el ancho. Reservar ancho obligaba a nowrap, y con eso el
+   * remate más largo ensanchaba el título hasta pasarse de la columna, que el
+   * overflow del hero terminaba recortando. Reservando alto, el bloque nunca
+   * se mueve al escribir y borrar, y el texto envuelve si hace falta.
+   */
   .accent-slot {
     position: relative;
-    display: inline-block;
-    white-space: nowrap;
+    display: block;
+    max-width: 100%;
   }
 
-  // Reserva el ancho sin verse ni ser leído.
+  // Reserva el espacio sin verse ni ser leído.
   .accent-ghost {
     visibility: hidden;
   }
 
-  // El texto en curso y su cursor van sobre el hueco reservado; el cursor queda
-  // pegado a la última letra escrita, no al borde del hueco.
+  // El texto en curso y su cursor van encima del hueco reservado; el cursor
+  // queda pegado a la última letra escrita.
   .accent-live {
     position: absolute;
     left: 0;
     top: 0;
-    white-space: pre;
+    width: 100%;
+    white-space: pre-wrap;
   }
 
   // Sin color de marca, el remate del título se distingue por trazo, no por tono.
@@ -190,26 +196,6 @@
 }
 
 @media (max-width: 45rem) {
-  /*
-   * En pantalla chica el hueco del remate más largo no entra: al forzarlo con
-   * nowrap ensanchaba el título, y con él toda la columna del hero, que el
-   * overflow terminaba recortando. Acá el texto fluye y el título se reacomoda
-   * al cambiar de frase; el salto molesta menos que perder media frase.
-   */
-  .title .accent-slot {
-    max-width: 100%;
-    white-space: normal;
-  }
-
-  .title .accent-ghost {
-    display: none;
-  }
-
-  .title .accent-live {
-    position: static;
-    white-space: pre-wrap;
-  }
-
   .hero-inner {
     padding: var(--space-7) 1.25rem var(--space-6);
   }
