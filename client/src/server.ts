@@ -7,6 +7,8 @@ import {
 import express from 'express';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { handleContact } from './server/contact.handler';
+import { DEFAULT_LANG, langFromAcceptLanguage } from './app/domain/models/language.model';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -15,16 +17,19 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * API endpoints. Deben registrarse antes del handler de Angular.
  */
+app.post('/api/contact', express.json({ limit: '16kb' }), handleContact);
+
+/**
+ * La raíz no tiene contenido propio: deriva al one-page del idioma del visitante.
+ * Se resuelve acá, con un 302, para que los buscadores lleguen directo a /es o /en
+ * en vez de a un redirect en el cliente.
+ */
+app.get('/', (req, res) => {
+  const lang = langFromAcceptLanguage(req.headers['accept-language'] ?? '') ?? DEFAULT_LANG;
+  res.redirect(302, `/${lang}`);
+});
 
 /**
  * Serve static files from /browser

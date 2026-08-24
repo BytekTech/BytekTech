@@ -1,0 +1,30 @@
+<section class="faq" id="preguntas">
+  <div class="section-inner">
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().faq.eyebrow }}
+      </p>
+      <h2 class="section-title">{{ t().faq.title }}</h2>
+      <p class="section-subtitle">{{ t().faq.subtitle }}</p>
+    </header>
+
+    <div class="list">
+      @for (faq of faqs(); track faq.id) {
+        <details class="item" name="faq">
+          <summary class="question">
+            <h3>{{ faq.copy[lang()].question }}</h3>
+            <span class="marker" aria-hidden="true"></span>
+          </summary>
+          <p class="answer">{{ faq.copy[lang()].answer }}</p>
+        </details>
+      }
+    </div>
+
+    <p class="still-asking">
+      <span aria-hidden="true">//</span>
+      {{ t().faq.stillAsking }}
+      <a href="#contacto">{{ t().faq.cta }}</a>
+    </p>
+  </div>
+</section>

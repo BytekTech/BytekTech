@@ -1,11 +1,33 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Client</title>
+  <title>Bytek Technology — Ingeniería de software</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bytek Technology diseña y construye software a medida para empresas: productos digitales, plataformas web y sistemas internos.">
+  <meta name="theme-color" content="#f7f7f8">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="/fonts/space-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/jetbrains-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <script>
+    // Aplica el tema elegido antes del primer pintado: si esperáramos a que
+    // arranque Angular, quien eligió el oscuro vería un destello claro.
+    // Sin elección guardada no se toca nada y decide prefers-color-scheme.
+    (function () {
+      try {
+        var saved = localStorage.getItem('bytek.theme');
+        if (saved === 'light' || saved === 'dark') {
+          document.documentElement.dataset.theme = saved;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', saved === 'dark' ? '#0b0c0e' : '#f7f7f8');
+        }
+      } catch (error) {
+        // Almacenamiento bloqueado: se sigue con la preferencia del sistema.
+      }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

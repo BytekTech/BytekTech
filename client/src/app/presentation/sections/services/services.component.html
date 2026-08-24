@@ -1,0 +1,32 @@
+<section class="services" id="servicios">
+  <div class="section-inner">
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().services.eyebrow }}
+      </p>
+      <h2 class="section-title">{{ t().services.title }}</h2>
+      <p class="section-subtitle">{{ t().services.subtitle }}</p>
+    </header>
+
+    <ul class="grid">
+      @for (service of services(); track service.id) {
+        <li class="card">
+          <span class="bits" aria-hidden="true">{{ service.bits }}</span>
+          <h3 class="name">{{ service.copy[lang()].name }}</h3>
+          <p class="description">{{ service.copy[lang()].description }}</p>
+
+          <p class="deliverables-label">
+            <span aria-hidden="true">//</span>
+            {{ t().services.deliverablesLabel }}
+          </p>
+          <ul class="deliverables">
+            @for (deliverable of service.copy[lang()].deliverables; track deliverable) {
+              <li>{{ deliverable }}</li>
+            }
+          </ul>
+        </li>
+      }
+    </ul>
+  </div>
+</section>

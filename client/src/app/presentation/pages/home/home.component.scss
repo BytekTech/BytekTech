@@ -1,0 +1,226 @@
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--header-height));
+  overflow: hidden;
+  // Aísla las capas de fondo: quedan detrás del contenido del hero y nunca
+  // por detrás del resto de la página.
+  isolation: isolate;
+}
+
+/*
+ * Trama técnica: grilla fina con un punto en cada cruce, como un papel
+ * cuadriculado de ingeniería. Se desvanece hacia los bordes con una máscara
+ * radial para que no llegue plana al título ni corte de golpe contra la
+ * sección siguiente.
+ */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    radial-gradient(circle at center, var(--grid-dot) 1.5px, transparent 1.6px),
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 4.5rem 4.5rem;
+  background-position: -0.75px -0.75px;
+  -webkit-mask-image: radial-gradient(ellipse 88% 72% at 40% 42%, #000 28%, transparent 100%);
+  mask-image: radial-gradient(ellipse 88% 72% at 40% 42%, #000 28%, transparent 100%);
+}
+
+/* Halo que levanta el sector donde vive el motivo binario. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    ellipse 55% 45% at 78% 24%,
+    rgb(var(--shadow-color) / 7%),
+    transparent 70%
+  );
+}
+
+.hero-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-7);
+}
+
+.hero-copy {
+  max-width: 46rem;
+}
+
+.title {
+  margin: 0 0 1.75rem;
+  font-size: clamp(2.5rem, 6.2vw, 4.6rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+
+  // El hueco del remate mide siempre lo que el remate más largo: así el título
+  // no se reacomoda con cada letra que se escribe o se borra.
+  .accent-slot {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  // Reserva el ancho sin verse ni ser leído.
+  .accent-ghost {
+    visibility: hidden;
+  }
+
+  // El texto en curso y su cursor van sobre el hueco reservado; el cursor queda
+  // pegado a la última letra escrita, no al borde del hueco.
+  .accent-live {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: pre;
+  }
+
+  // Sin color de marca, el remate del título se distingue por trazo, no por tono.
+  .accent {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-thickness: 0.055em;
+    text-underline-offset: 0.14em;
+  }
+
+  .caret {
+    display: inline-block;
+    width: 0.09em;
+    height: 0.88em;
+    margin-left: 0.14em;
+    vertical-align: baseline;
+    transform: translateY(0.1em);
+    background: var(--accent);
+    animation: blink 1.06s infinite;
+
+    // Mientras se escribe o se borra, el cursor queda firme: sólo late en las
+    // pausas, igual que en un editor de texto.
+    &.typing {
+      animation: none;
+      opacity: 1;
+    }
+  }
+}
+
+.subtitle {
+  margin: 0 0 2.75rem;
+  max-width: 34rem;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: var(--steel);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.bytes {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  font-family: var(--font-mono);
+}
+
+.byte-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.1rem;
+}
+
+.byte-bits {
+  font-size: 0.82rem;
+  letter-spacing: 0.32em;
+  color: var(--steel);
+  opacity: 0.55;
+}
+
+.byte-char {
+  min-width: 1ch;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.4rem 2rem;
+  border-top: 1px solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--steel);
+
+  .strip-label span {
+    color: var(--accent);
+    margin-right: 0.4em;
+  }
+}
+
+@media (max-width: 64rem) {
+  .bytes {
+    display: none;
+  }
+}
+
+@media (max-width: 45rem) {
+  /*
+   * En pantalla chica el hueco del remate más largo no entra: al forzarlo con
+   * nowrap ensanchaba el título, y con él toda la columna del hero, que el
+   * overflow terminaba recortando. Acá el texto fluye y el título se reacomoda
+   * al cambiar de frase; el salto molesta menos que perder media frase.
+   */
+  .title .accent-slot {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .title .accent-ghost {
+    display: none;
+  }
+
+  .title .accent-live {
+    position: static;
+    white-space: pre-wrap;
+  }
+
+  .hero-inner {
+    padding: var(--space-7) 1.25rem var(--space-6);
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .strip {
+    // El botón del asistente flota sobre esta esquina: se le deja el lugar.
+    padding: 1.2rem 5rem 1.2rem 1.25rem;
+    letter-spacing: 0.12em;
+  }
+}

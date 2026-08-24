@@ -1,0 +1,27 @@
+<section class="process" id="proceso">
+  <div class="section-inner">
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().process.eyebrow }}
+      </p>
+      <h2 class="section-title">{{ t().process.title }}</h2>
+      <p class="section-subtitle">{{ t().process.subtitle }}</p>
+    </header>
+
+    <ol class="steps">
+      @for (step of steps(); track step.id) {
+        <li class="step">
+          <span class="order" aria-hidden="true">{{ step.order.toString().padStart(2, '0') }}</span>
+          <div class="body">
+            <h3 class="name">{{ step.copy[lang()].name }}</h3>
+            <p class="description">{{ step.copy[lang()].description }}</p>
+            <span class="duration">{{ step.copy[lang()].duration }}</span>
+          </div>
+        </li>
+      }
+    </ol>
+
+    <a class="btn btn-primary" href="#contacto">{{ t().process.cta }}</a>
+  </div>
+</section>

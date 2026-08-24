@@ -1,0 +1,55 @@
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().hero.eyebrow }}
+      </p>
+
+      <h1 class="title">
+        {{ displayTitle() }}
+        <span class="accent-slot"
+          ><span class="accent-ghost" aria-hidden="true">{{ longestAccent() }}</span
+          ><span class="accent-live"
+            ><span class="accent">{{ displayAccent() }}</span
+            ><span class="caret" [class.typing]="isTyping()" aria-hidden="true"></span
+          ></span
+        ></span>
+      </h1>
+
+      <p class="subtitle">{{ t().hero.subtitle }}</p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="#contacto">{{ t().hero.ctaPrimary }}</a>
+        <a class="btn btn-ghost" href="#clientes">
+          {{ t().hero.ctaSecondary }}
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </div>
+
+    <aside class="bytes" aria-hidden="true">
+      @for (byte of bytes; track byte.char) {
+        <div class="byte-row">
+          <span class="byte-bits">{{ byte.bits }}</span>
+          <span class="byte-char">{{ byte.char }}</span>
+        </div>
+      }
+    </aside>
+  </div>
+
+  <footer class="strip">
+    <span class="strip-label">
+      <span aria-hidden="true">//</span>
+      {{ t().hero.stripLabel }}
+    </span>
+    <span class="strip-items">{{ t().hero.stripItems }}</span>
+  </footer>
+</section>
+
+<app-services />
+<app-metrics />
+<app-clients />
+<app-process />
+<app-faq />
+<app-contact />

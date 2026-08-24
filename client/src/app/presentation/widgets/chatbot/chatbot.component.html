@@ -1,0 +1,65 @@
+<button
+  #toggleButton
+  type="button"
+  class="fab"
+  aria-controls="chatbot-panel"
+  [attr.aria-expanded]="isOpen()"
+  [attr.aria-label]="isOpen() ? t().chatbot.close : t().chatbot.open"
+  (click)="toggle()"
+>
+  <span class="fab-icon" aria-hidden="true">&gt;_</span>
+</button>
+
+@if (isOpen()) {
+  <div
+    #panel
+    id="chatbot-panel"
+    class="panel"
+    role="dialog"
+    aria-modal="true"
+    appFocusTrap
+    tabindex="-1"
+    [attr.aria-label]="t().chatbot.title"
+  >
+    <header class="panel-head">
+      <span class="panel-title">{{ t().chatbot.title }}</span>
+      <button
+        type="button"
+        class="panel-close"
+        [attr.aria-label]="t().chatbot.close"
+        (click)="close()"
+      >
+        ×
+      </button>
+    </header>
+
+    <div class="thread" #thread>
+      @for (message of messages(); track $index) {
+        <div
+          class="bubble"
+          [class.bubble-user]="message.role === 'user'"
+          [class.bubble-bot]="message.role === 'bot'"
+        >
+          {{ textFor(message) }}
+        </div>
+      }
+      @if (isTyping()) {
+        <div class="bubble bubble-bot typing" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      }
+    </div>
+
+    <div class="chips">
+      <p class="chips-label">
+        <span aria-hidden="true">//</span>
+        {{ t().chatbot.prompt }}
+      </p>
+      @for (faq of faqs(); track faq.id) {
+        <button type="button" class="chip" [disabled]="isTyping()" (click)="ask(faq)">
+          {{ faq.copy[lang()].question }}
+        </button>
+      }
+    </div>
+  </div>
+}

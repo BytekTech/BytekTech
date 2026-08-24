@@ -1,0 +1,20 @@
+<section class="clients" id="clientes">
+  <div class="section-inner">
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().clients.eyebrow }}
+      </p>
+      <h2 class="section-title">{{ t().clients.title }}</h2>
+      <p class="section-subtitle">{{ t().clients.subtitle }}</p>
+    </header>
+
+    <ul class="grid">
+      @for (client of clients(); track client.id) {
+        <li>
+          <app-client-card [client]="client" />
+        </li>
+      }
+    </ul>
+  </div>
+</section>

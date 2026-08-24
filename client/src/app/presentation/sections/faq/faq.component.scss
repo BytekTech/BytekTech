@@ -1,0 +1,103 @@
+.faq {
+  border-top: 1px solid var(--line);
+}
+
+.list {
+  // 60% de la pantalla, sin achicarse de más en móvil ni desbordar la columna.
+  width: min(100%, max(60vw, 34rem));
+  border-top: 1px solid var(--line-strong);
+}
+
+.item {
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-5) 0;
+  cursor: pointer;
+  list-style: none;
+
+  // Oculta el triángulo nativo en WebKit sin perder el comportamiento del elemento.
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  &:hover h3 {
+    color: var(--accent);
+  }
+}
+
+// Marcador propio: un "+" que rota hasta ser un "−" al abrirse.
+.marker {
+  position: relative;
+  flex: none;
+  width: 0.85rem;
+  height: 0.85rem;
+  transition: transform var(--duration-base) var(--ease);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto;
+    height: 1.5px;
+    background: var(--accent);
+  }
+
+  &::after {
+    transform: rotate(90deg);
+    transition: opacity var(--duration-base) var(--ease);
+  }
+}
+
+.item[open] .marker {
+  transform: rotate(180deg);
+
+  &::after {
+    opacity: 0;
+  }
+}
+
+.answer {
+  margin: 0;
+  padding: 0 var(--space-7) var(--space-5) 0;
+  max-width: 44rem;
+  font-size: 0.98rem;
+  line-height: 1.7;
+  color: var(--steel);
+}
+
+.still-asking {
+  margin: var(--space-7) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--steel);
+
+  span {
+    color: var(--accent);
+    margin-right: 0.4em;
+  }
+
+  a {
+    margin-left: 0.5em;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+
+    &:hover {
+      color: var(--accent-strong);
+    }
+  }
+}

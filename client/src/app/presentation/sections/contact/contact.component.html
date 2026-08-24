@@ -1,0 +1,93 @@
+<section class="contact" id="contacto">
+  <div class="section-inner">
+    <div class="info">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().contact.eyebrow }}
+      </p>
+      <h2 class="section-title">{{ t().contact.title }}</h2>
+      <p class="section-subtitle">{{ t().contact.subtitle }}</p>
+      <p class="note">{{ t().contact.note }}</p>
+
+      <div class="direct">
+        <p class="direct-label">
+          <span aria-hidden="true">//</span>
+          {{ t().contact.directLabel }}
+        </p>
+        <a class="direct-email" [href]="'mailto:' + company.email">{{ company.email }}</a>
+        <span class="direct-location">{{ company.location }}</span>
+      </div>
+    </div>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="field">
+        <label for="contact-name">{{ t().contact.form.name }}</label>
+        <input
+          id="contact-name"
+          type="text"
+          formControlName="name"
+          autocomplete="name"
+          [attr.aria-invalid]="showError('name')"
+        />
+        @if (showError('name')) {
+          <small class="field-error">{{ t().contact.form.requiredError }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="contact-email">{{ t().contact.form.email }}</label>
+        <input
+          id="contact-email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [attr.aria-invalid]="showError('email')"
+        />
+        @if (showError('email')) {
+          <small class="field-error">{{ emailErrorMessage() }}</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="contact-company">{{ t().contact.form.company }}</label>
+        <input
+          id="contact-company"
+          type="text"
+          formControlName="company"
+          autocomplete="organization"
+        />
+      </div>
+
+      <div class="field">
+        <label for="contact-message">{{ t().contact.form.message }}</label>
+        <textarea
+          id="contact-message"
+          rows="5"
+          formControlName="message"
+          [attr.aria-invalid]="showError('message')"
+        ></textarea>
+        @if (showError('message')) {
+          <small class="field-error">{{ t().contact.form.requiredError }}</small>
+        }
+      </div>
+
+      <!-- Trampa anti-spam: fuera de la vista, del orden de tabulación y del árbol de accesibilidad. -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="contact-website">No completar</label>
+        <input id="contact-website" type="text" formControlName="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="status() === 'sending'">
+        {{ status() === 'sending' ? t().contact.form.sending : t().contact.form.submit }}
+      </button>
+
+      <p class="form-status" aria-live="polite">
+        @if (status() === 'success') {
+          <span class="status-success">{{ t().contact.form.success }}</span>
+        } @else if (status() === 'error') {
+          <span class="status-error">{{ t().contact.form.error }}</span>
+        }
+      </p>
+    </form>
+  </div>
+</section>

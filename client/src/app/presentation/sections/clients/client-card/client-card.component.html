@@ -1,0 +1,27 @@
+<article class="card">
+  <div class="mark" aria-hidden="true">
+    <div class="pattern">
+      @for (bit of bits(); track $index) {
+        <span class="cell" [class.on]="bit"></span>
+      }
+    </div>
+  </div>
+
+  <div class="body">
+    <h3 class="name">
+      @if (client().website) {
+        <a [href]="client().website" target="_blank" rel="noopener noreferrer">
+          {{ client().name }}
+        </a>
+      } @else {
+        {{ client().name }}
+      }
+    </h3>
+    <p class="industry">{{ copy().industry }}</p>
+    <p class="summary">{{ copy().summary }}</p>
+  </div>
+
+  <footer class="meta">
+    <span class="since">{{ t().clients.sinceLabel }} {{ client().since }}</span>
+  </footer>
+</article>

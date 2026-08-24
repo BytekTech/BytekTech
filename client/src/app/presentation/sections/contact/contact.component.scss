@@ -1,0 +1,164 @@
+.contact {
+  border-top: 1px solid var(--line);
+}
+
+.contact .section-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 4rem;
+  align-items: start;
+}
+
+.note {
+  margin: 2rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+
+  input,
+  textarea {
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 0.5rem;
+    background: var(--surface);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    color: var(--ink);
+    transition: border-color 150ms ease;
+
+    &:hover {
+      border-color: var(--steel);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--error);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 7rem;
+  }
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: var(--error);
+}
+
+.btn-primary {
+  align-self: flex-start;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+    transform: none;
+  }
+}
+
+.form-status {
+  min-height: 1.4rem;
+  margin: 0;
+  font-size: 0.9rem;
+
+  .status-success {
+    color: var(--accent);
+  }
+
+  .status-error {
+    color: var(--error);
+  }
+}
+
+@media (max-width: 52rem) {
+  .contact .section-inner {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .note {
+    margin-top: 1.25rem;
+  }
+}
+
+.direct {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--line-strong);
+}
+
+.direct-label {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--steel-light);
+
+  span {
+    color: var(--accent);
+    margin-right: 0.4em;
+  }
+}
+
+.direct-email {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: var(--line-strong);
+  transition:
+    color var(--duration-fast) var(--ease),
+    text-decoration-color var(--duration-fast) var(--ease);
+
+  &:hover {
+    color: var(--accent);
+    text-decoration-color: var(--accent);
+  }
+}
+
+.direct-location {
+  font-size: 0.92rem;
+  color: var(--steel);
+}
+
+// El campo trampa se saca de la vista sin display:none, que algunos bots detectan.
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

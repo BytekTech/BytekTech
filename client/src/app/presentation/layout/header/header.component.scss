@@ -1,0 +1,221 @@
+:host {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: block;
+  background: var(--header-bg);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid transparent;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  height: var(--header-height);
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.wordmark {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+
+  .bit {
+    width: 0.42em;
+    height: 0.42em;
+    margin-left: 0.22em;
+    background: var(--accent);
+    animation: blink 1.06s infinite;
+  }
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-6);
+
+  a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--steel);
+    transition: color var(--duration-fast) var(--ease);
+
+    &:hover {
+      color: var(--ink);
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.lang {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+
+  button {
+    padding: 0.25rem 0.15rem;
+    border: 0;
+    background: none;
+    color: var(--steel);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: color var(--duration-fast) var(--ease);
+
+    &:hover {
+      color: var(--ink);
+    }
+
+    &.active {
+      color: var(--accent);
+      font-weight: 600;
+    }
+  }
+
+  .lang-divider {
+    color: var(--line-strong);
+    user-select: none;
+  }
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--steel);
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease),
+    border-color var(--duration-fast) var(--ease);
+
+  &:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+}
+
+// Los iconos se dibujan con trazo para que hereden el color del botón.
+.theme-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.menu-toggle {
+  display: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+}
+
+// Dos barras que se cruzan en X al abrir el menú.
+.menu-icon {
+  position: relative;
+  display: block;
+  width: 1rem;
+  height: 1px;
+  margin: 0 auto;
+  background: var(--ink);
+  transition: background-color var(--duration-fast) var(--ease);
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--ink);
+    transition: transform var(--duration-base) var(--ease);
+  }
+
+  &::before {
+    transform: translateY(-5px);
+  }
+
+  &::after {
+    transform: translateY(5px);
+  }
+
+  &.open {
+    background: transparent;
+
+    &::before {
+      transform: rotate(45deg);
+    }
+
+    &::after {
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) var(--space-6) var(--space-5);
+  border-top: 1px solid var(--line);
+
+  a {
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--ink);
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
+@media (min-width: 56rem) {
+  .menu {
+    display: none;
+  }
+}
+
+@media (max-width: 56rem) {
+  .nav {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+}
+
+@media (max-width: 45rem) {
+  .header {
+    padding: 0 1.25rem;
+  }
+
+  .menu {
+    padding-inline: 1.25rem;
+  }
+}

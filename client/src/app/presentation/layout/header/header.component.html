@@ -1,0 +1,73 @@
+<header class="header">
+  <a class="wordmark" [href]="'/' + lang()">bytek<span class="bit" aria-hidden="true"></span></a>
+
+  <nav class="nav" [attr.aria-label]="t().footer.navLabel">
+    <a href="#servicios">{{ t().nav.services }}</a>
+    <a href="#clientes">{{ t().nav.clients }}</a>
+    <a href="#proceso">{{ t().nav.process }}</a>
+    <a href="#preguntas">{{ t().nav.faq }}</a>
+    <a href="#contacto">{{ t().nav.contact }}</a>
+  </nav>
+
+  <div class="actions">
+    <div class="lang" role="group" [attr.aria-label]="t().nav.langLabel">
+      <button
+        type="button"
+        [class.active]="lang() === 'es'"
+        [attr.aria-pressed]="lang() === 'es'"
+        (click)="setLang('es')"
+      >
+        ES
+      </button>
+      <span class="lang-divider" aria-hidden="true">/</span>
+      <button
+        type="button"
+        [class.active]="lang() === 'en'"
+        [attr.aria-pressed]="lang() === 'en'"
+        (click)="setLang('en')"
+      >
+        EN
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="theme-toggle"
+      [attr.aria-label]="themeActionLabel()"
+      [title]="themeActionLabel()"
+      (click)="toggleTheme()"
+    >
+      @if (theme() === 'dark') {
+        <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.4" />
+          <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" />
+        </svg>
+      } @else {
+        <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" />
+        </svg>
+      }
+    </button>
+
+    <button
+      type="button"
+      class="menu-toggle"
+      aria-controls="header-menu"
+      [attr.aria-expanded]="isMenuOpen()"
+      [attr.aria-label]="isMenuOpen() ? t().nav.menuClose : t().nav.menuOpen"
+      (click)="toggleMenu()"
+    >
+      <span class="menu-icon" [class.open]="isMenuOpen()" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+@if (isMenuOpen()) {
+  <nav id="header-menu" class="menu" [attr.aria-label]="t().footer.navLabel">
+    <a href="#servicios" (click)="closeMenu()">{{ t().nav.services }}</a>
+    <a href="#clientes" (click)="closeMenu()">{{ t().nav.clients }}</a>
+    <a href="#proceso" (click)="closeMenu()">{{ t().nav.process }}</a>
+    <a href="#preguntas" (click)="closeMenu()">{{ t().nav.faq }}</a>
+    <a href="#contacto" (click)="closeMenu()">{{ t().nav.contact }}</a>
+  </nav>
+}

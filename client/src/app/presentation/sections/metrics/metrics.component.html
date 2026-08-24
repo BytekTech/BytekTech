@@ -1,0 +1,25 @@
+<section class="metrics section-invert">
+  <div class="section-inner">
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().metrics.eyebrow }}
+      </p>
+      <h2 class="section-title">{{ t().metrics.title }}</h2>
+    </header>
+
+    <dl class="grid">
+      @for (metric of metrics(); track metric.id) {
+        <div class="metric">
+          <dd class="value">
+            <span [appCountUp]="metric.value"></span><span class="suffix">{{ metric.suffix }}</span>
+          </dd>
+          <dt class="label">
+            {{ metric.copy[lang()].label }}
+            <span class="detail">{{ metric.copy[lang()].detail }}</span>
+          </dt>
+        </div>
+      }
+    </dl>
+  </div>
+</section>

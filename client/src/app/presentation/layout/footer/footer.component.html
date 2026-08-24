@@ -1,0 +1,35 @@
+<footer class="footer">
+  <div class="section-inner">
+    <div class="top">
+      <div class="brand">
+        <span class="wordmark">bytek<span class="bit" aria-hidden="true"></span></span>
+        <p class="tagline">{{ t().footer.tagline }}</p>
+      </div>
+
+      <nav class="links" [attr.aria-label]="t().footer.navLabel">
+        <p class="links-label">{{ t().footer.navLabel }}</p>
+        <a href="#servicios">{{ t().nav.services }}</a>
+        <a href="#clientes">{{ t().nav.clients }}</a>
+        <a href="#proceso">{{ t().nav.process }}</a>
+        <a href="#preguntas">{{ t().nav.faq }}</a>
+      </nav>
+
+      <div class="links">
+        <p class="links-label">{{ t().footer.contactLabel }}</p>
+        <a [href]="'mailto:' + company.email">{{ company.email }}</a>
+        <span class="location">{{ company.location }}</span>
+      </div>
+
+      <div class="links">
+        <p class="links-label">{{ t().footer.followLabel }}</p>
+        @for (link of company.social; track link.name) {
+          <a [href]="link.url" target="_blank" rel="noopener noreferrer">{{ link.name }}</a>
+        }
+      </div>
+    </div>
+
+    <div class="bottom">
+      <span>© {{ currentYear }} {{ company.legalName }}. {{ t().footer.rights }}</span>
+    </div>
+  </div>
+</footer>
