@@ -1,7 +1,12 @@
-/** Desaceleración: arranca rápido y se asienta en el valor final sin rebote. */
-export function easeOutCubic(progress: number): number {
+/**
+ * Desaceleración de la cuenta. La potencia alta hace que el grueso del recorrido
+ * pase en el primer tercio del tiempo y que las últimas cifras se acomoden
+ * despacio: la cuenta entra a fondo y llega apoyando, que es donde el ojo se
+ * detiene a leer el número.
+ */
+export function easeOutQuint(progress: number): number {
   const clamped = Math.min(Math.max(progress, 0), 1);
-  return 1 - Math.pow(1 - clamped, 3);
+  return 1 - Math.pow(1 - clamped, 5);
 }
 
 /**
@@ -12,5 +17,5 @@ export function countUpValue(target: number, progress: number): number {
   if (progress >= 1) {
     return target;
   }
-  return Math.floor(target * easeOutCubic(progress));
+  return Math.floor(target * easeOutQuint(progress));
 }

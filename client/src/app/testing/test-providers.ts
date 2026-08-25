@@ -10,11 +10,13 @@ import { ServiceRepository } from '../domain/repositories/service.repository';
 import { TRANSLATIONS } from '../data/i18n/translations.data';
 import { COMPANY } from '../data/company/company.data';
 import { HttpContactGateway } from '../data/contact/http-contact.gateway';
-import { StaticFaqRepository } from '../data/faq/static-faq.repository';
-import { StaticMetricRepository } from '../data/metrics/static-metric.repository';
-import { StaticProcessStepRepository } from '../data/process/static-process-step.repository';
-import { StaticClientRepository } from '../data/clients/static-client.repository';
-import { StaticServiceRepository } from '../data/services/static-service.repository';
+import { ContentRepository } from '../domain/repositories/content.repository';
+import { SeedContentRepository } from './seed-content.repository';
+import { ContentClientRepository } from '../data/content/content-client.repository';
+import { ContentServiceRepository } from '../data/content/content-service.repository';
+import { ContentMetricRepository } from '../data/content/content-metric.repository';
+import { ContentProcessStepRepository } from '../data/content/content-process-step.repository';
+import { ContentFaqRepository } from '../data/content/content-faq.repository';
 
 /**
  * Las mismas implementaciones que usa la composition root, para que los tests
@@ -24,10 +26,11 @@ import { StaticServiceRepository } from '../data/services/static-service.reposit
 export const contentProviders: Provider[] = [
   { provide: APP_TRANSLATIONS, useValue: TRANSLATIONS },
   { provide: COMPANY_INFO, useValue: COMPANY },
-  { provide: ClientRepository, useClass: StaticClientRepository },
-  { provide: ServiceRepository, useClass: StaticServiceRepository },
-  { provide: MetricRepository, useClass: StaticMetricRepository },
-  { provide: ProcessStepRepository, useClass: StaticProcessStepRepository },
-  { provide: FaqRepository, useClass: StaticFaqRepository },
+  { provide: ContentRepository, useClass: SeedContentRepository },
+  { provide: ClientRepository, useClass: ContentClientRepository },
+  { provide: ServiceRepository, useClass: ContentServiceRepository },
+  { provide: MetricRepository, useClass: ContentMetricRepository },
+  { provide: ProcessStepRepository, useClass: ContentProcessStepRepository },
+  { provide: FaqRepository, useClass: ContentFaqRepository },
   { provide: ContactGateway, useClass: HttpContactGateway },
 ];

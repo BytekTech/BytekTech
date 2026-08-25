@@ -3,13 +3,16 @@ import { Metric } from '../../domain/models/metric.model';
 // ─────────────────────────────────────────────────────────────────────────────
 // [COMPLETAR] Cifras provisorias. Son afirmaciones públicas sobre la empresa:
 // reemplazar por números reales y verificables antes de publicar el sitio.
-// El único dato que ya está confirmado es la duración del MVP (ver faq.data.ts).
+//
+// Las dos últimas ('on-time' y 'retention') son una propuesta: hablan de lo que
+// le pasa al cliente —recibe en fecha y se queda— en vez de describirnos a
+// nosotros. Confirmar los valores o cambiar la métrica antes de publicar.
 // ─────────────────────────────────────────────────────────────────────────────
 export const METRICS: Metric[] = [
   {
     id: 'projects',
-    value: 20,
-    suffix: '+',
+    value: 12,
+    prefix: '+',
     copy: {
       es: { label: 'Proyectos entregados', detail: 'en producción, no en demo' },
       en: { label: 'Projects delivered', detail: 'in production, not in demo' },
@@ -17,28 +20,41 @@ export const METRICS: Metric[] = [
   },
   {
     id: 'years',
-    value: 6,
+    value: 3,
+    prefix: '+',
     copy: {
       es: { label: 'Años construyendo software', detail: 'para empresas de distintos rubros' },
       en: { label: 'Years building software', detail: 'for companies across industries' },
     },
   },
   {
-    id: 'mvp',
-    value: 8,
-    suffix: ' sem',
+    id: 'on-time',
+    value: 95,
+    suffix: ' %',
     copy: {
-      es: { label: 'Promedio hasta el MVP', detail: 'de la primera reunión a producción' },
-      en: { label: 'Average time to MVP', detail: 'from the first meeting to production' },
+      es: {
+        label: 'Entregas en la fecha acordada',
+        detail: 'con el alcance y el precio cerrados de entrada',
+      },
+      en: {
+        label: 'Deliveries on the agreed date',
+        detail: 'with scope and price fixed up front',
+      },
     },
   },
   {
-    id: 'response',
-    value: 48,
-    suffix: ' h',
+    id: 'retention',
+    value: 9,
+    suffix: '/10',
     copy: {
-      es: { label: 'Respuesta a tu consulta', detail: 'hábiles, con próximos pasos concretos' },
-      en: { label: 'Reply to your enquiry', detail: 'business hours, with concrete next steps' },
+      es: {
+        label: 'Clientes que siguen con nosotros',
+        detail: 'después del primer proyecto entregado',
+      },
+      en: {
+        label: 'Clients that stay with us',
+        detail: 'after the first project ships',
+      },
     },
   },
 ];

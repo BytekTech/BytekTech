@@ -25,6 +25,28 @@ export function scrambleFrames(target: string, random: () => number = Math.rando
   return frames;
 }
 
+export interface ScrambleWord {
+  /** La palabra definitiva: es la que reserva el lugar en el renglón. */
+  final: string;
+  /** La que se está mostrando en este cuadro, ruido incluido. */
+  current: string;
+}
+
+/**
+ * Empareja el título definitivo con el que se está mostrando, palabra por
+ * palabra. El efecto conserva la longitud y los espacios, así que las dos
+ * listas coinciden; ante cualquier desajuste —un cambio de idioma a mitad de
+ * la animación— manda el texto definitivo.
+ */
+export function pairWords(final: string, current: string): ScrambleWord[] {
+  const currentWords = current.split(' ');
+
+  return final.split(' ').map((word, index) => ({
+    final: word,
+    current: currentWords[index]?.length === word.length ? currentWords[index] : word,
+  }));
+}
+
 /** Ruido para la parte aún no revelada, respetando los espacios del original. */
 function noise(target: string, from: number, random: () => number): string {
   let text = '';

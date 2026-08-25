@@ -1,5 +1,6 @@
 import { Service } from '../../domain/models/service.model';
 
+// Los servicios que salieron de la grilla viven en services.archive.ts.
 export const SERVICES: Service[] = [
   {
     id: 'web',
@@ -52,24 +53,6 @@ export const SERVICES: Service[] = [
         description:
           'We automate what lives in spreadsheets today and connect the tools you already use: ERP, invoicing, CRM and third-party services talking to each other.',
         deliverables: ['Less manual work', 'Connected to your tools', 'Your history comes along'],
-      },
-    },
-  },
-  {
-    id: 'cloud',
-    bits: '01100011',
-    copy: {
-      es: {
-        name: 'Cloud, datos e infraestructura',
-        description:
-          'Infraestructura que escala sin sorpresas en la factura, con métricas a la vista: monitoreo, alertas y tableros para decidir con datos y no con intuición.',
-        deliverables: ['Costos previsibles', 'Nos enteramos antes que el cliente', 'Tableros para decidir'],
-      },
-      en: {
-        name: 'Cloud, data and infrastructure',
-        description:
-          'Infrastructure that scales without billing surprises, with metrics in plain sight: monitoring, alerts and dashboards so you decide on data, not intuition.',
-        deliverables: ['Predictable costs', 'We find out before your client', 'Dashboards to decide with'],
       },
     },
   },

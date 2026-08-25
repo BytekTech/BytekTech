@@ -1,0 +1,146 @@
+<section class="admin">
+  <header class="head">
+    <h1 class="wordmark">bytek<span class="bit" aria-hidden="true"></span> <span class="panel-name">panel</span></h1>
+    @if (isAuthenticated()) {
+      <button type="button" class="ghost" (click)="logout()">Cerrar sesión</button>
+    }
+  </header>
+
+  @if (isChecking()) {
+    <p class="notice">Comprobando la sesión…</p>
+  } @else if (!isAuthenticated()) {
+    <form class="login" (submit)="$event.preventDefault(); login(password.value)">
+      <label for="admin-password">Clave del panel</label>
+      <input id="admin-password" #password type="password" autocomplete="current-password" required />
+      <button type="submit" class="primary">Entrar</button>
+      @if (loginError()) {
+        <p class="error" role="alert">{{ loginError() }}</p>
+      }
+    </form>
+  } @else {
+    <nav class="tabs" aria-label="Secciones del sitio">
+      @for (candidate of specs; track candidate.section) {
+        <button
+          type="button"
+          [class.active]="activeSection() === candidate.section"
+          [attr.aria-pressed]="activeSection() === candidate.section"
+          (click)="selectSection(candidate.section)"
+        >
+          {{ candidate.label }}
+        </button>
+      }
+    </nav>
+
+    <div class="toolbar">
+      <div class="lang" role="group" aria-label="Idioma que se está editando">
+        @for (option of langs; track option) {
+          <button
+            type="button"
+            [class.active]="activeLang() === option"
+            [attr.aria-pressed]="activeLang() === option"
+            (click)="activeLang.set(option)"
+          >
+            {{ option === 'es' ? 'Español' : 'Inglés' }}
+          </button>
+        }
+      </div>
+
+      <div class="actions">
+        <button type="button" class="ghost" (click)="add()">Agregar</button>
+        <button type="button" class="primary" [disabled]="saveState() === 'saving'" (click)="save()">
+          {{ saveState() === 'saving' ? 'Guardando…' : 'Publicar sección' }}
+        </button>
+      </div>
+    </div>
+
+    @if (saveState() === 'saved') {
+      <p class="notice ok" role="status">Publicado. Ya se ve en el sitio.</p>
+    } @else if (saveState() === 'failed') {
+      <p class="error" role="alert">{{ saveError() }}</p>
+    }
+
+    <ul class="rows">
+      @for (item of items(); track $index) {
+        <li>
+          <details class="row" [open]="isExpanded($index)">
+            <summary class="row-head" (click)="$event.preventDefault(); toggle($index)">
+              <span class="row-title">{{ titleFor(item) }}</span>
+              <span class="marker" aria-hidden="true"></span>
+            </summary>
+
+            <div class="row-body">
+              @for (field of spec().fields; track field.key) {
+                <p class="field" [class.wide]="field.kind === 'textarea' || field.kind === 'list'">
+                  <label [attr.for]="field.key + '-' + $index">
+                    {{ field.label }}
+                    @if (field.perLang) {
+                      <span class="tag">{{ activeLang() }}</span>
+                    }
+                    @if (field.hint) {
+                      <span class="hint">{{ field.hint }}</span>
+                    }
+                  </label>
+
+                  @switch (field.kind) {
+                    @case ('textarea') {
+                      <textarea
+                        [id]="field.key + '-' + $index"
+                        rows="3"
+                        [value]="valueOf(item, field)"
+                        (input)="update($index, field, $any($event.target).value)"
+                      ></textarea>
+                    }
+                    @case ('list') {
+                      <textarea
+                        [id]="field.key + '-' + $index"
+                        rows="4"
+                        placeholder="Uno por renglón"
+                        [value]="valueOf(item, field)"
+                        (input)="update($index, field, $any($event.target).value)"
+                      ></textarea>
+                    }
+                    @case ('color') {
+                      <span class="color-field">
+                        <input
+                          [id]="field.key + '-' + $index"
+                          type="color"
+                          [value]="valueOf(item, field) || '#000000'"
+                          (input)="update($index, field, $any($event.target).value)"
+                        />
+                        <span class="color-value">{{ valueOf(item, field) }}</span>
+                      </span>
+                    }
+                    @case ('number') {
+                      <input
+                        [id]="field.key + '-' + $index"
+                        type="number"
+                        [value]="valueOf(item, field)"
+                        (input)="update($index, field, $any($event.target).value)"
+                      />
+                    }
+                    @default {
+                      <input
+                        [id]="field.key + '-' + $index"
+                        type="text"
+                        [value]="valueOf(item, field)"
+                        (input)="update($index, field, $any($event.target).value)"
+                      />
+                    }
+                  }
+                </p>
+              }
+
+              <div class="row-actions">
+                <button type="button" class="ghost" (click)="move($index, -1)">Subir</button>
+                <button type="button" class="ghost" (click)="move($index, 1)">Bajar</button>
+                <button type="button" class="danger" (click)="remove($index)">Eliminar</button>
+              </div>
+            </div>
+          </details>
+        </li>
+      } @empty {
+        <li class="notice">Todavía no hay entradas en esta sección.</li>
+      }
+    </ul>
+  }
+</section>

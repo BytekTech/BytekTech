@@ -1,4 +1,4 @@
-<article class="card">
+<article class="tile" [title]="copy().summary" [style.--brand]="brandColor()">
   <div class="mark" aria-hidden="true">
     <div class="pattern">
       @for (bit of bits(); track $index) {
@@ -18,10 +18,5 @@
       }
     </h3>
     <p class="industry">{{ copy().industry }}</p>
-    <p class="summary">{{ copy().summary }}</p>
   </div>
-
-  <footer class="meta">
-    <span class="since">{{ t().clients.sinceLabel }} {{ client().since }}</span>
-  </footer>
 </article>

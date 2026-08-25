@@ -1,10 +1,51 @@
+@use 'breakpoints' as bp;
+
 .services {
   border-top: 1px solid var(--line);
 }
 
+/*
+ * El eyebrow y los frentes de trabajo forman una sola barra técnica de lado a
+ * lado de la sección. Por eso el encabezado deja de estar limitado a la medida
+ * de lectura y pasa a estarlo sólo el título y la bajada, que son los que se
+ * leen de corrido.
+ */
+.section-head {
+  max-width: none;
+}
+
+.section-title,
+.section-subtitle {
+  max-width: 46rem;
+}
+
+.head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+}
+
+.disciplines {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  color: var(--steel-light);
+
+  // El punto separador se pinta como el resto de los signos de la casa; el aire
+  // a los costados ya lo pone el interletrado de la línea.
+  .dot {
+    color: var(--accent);
+  }
+}
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-5);
   margin: 0;
   padding: 0;
@@ -91,7 +132,8 @@
   }
 }
 
-@media (max-width: 52rem) {
+// Tres tarjetas no entran en dos columnas sin dejar un hueco: se apilan de una.
+@include bp.below(lg) {
   .grid {
     grid-template-columns: 1fr;
   }

@@ -12,7 +12,9 @@
       @for (metric of metrics(); track metric.id) {
         <div class="metric">
           <dd class="value">
-            <span [appCountUp]="metric.value"></span><span class="suffix">{{ metric.suffix }}</span>
+            <span class="affix">{{ metric.prefix }}</span
+            ><span [appCountUp]="metric.value"></span
+            ><span class="affix">{{ metric.suffix }}</span>
           </dd>
           <dt class="label">
             {{ metric.copy[lang()].label }}

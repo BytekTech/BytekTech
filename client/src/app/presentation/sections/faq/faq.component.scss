@@ -1,10 +1,13 @@
+@use 'breakpoints' as bp;
+
 .faq {
   border-top: 1px solid var(--line);
 }
 
 .list {
-  // 60% de la pantalla, sin achicarse de más en móvil ni desbordar la columna.
-  width: min(100%, max(60vw, 34rem));
+  // A lo ancho de la sección: la medida de lectura la marca el 90% que ocupa
+  // cada pregunta dentro de su fila, no un recorte del listado entero.
+  width: 100%;
   border-top: 1px solid var(--line-strong);
 }
 
@@ -15,7 +18,6 @@
 .question {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-5);
   padding: var(--space-5) 0;
   cursor: pointer;
@@ -27,6 +29,9 @@
   }
 
   h3 {
+    // Nueve décimos de la fila para el texto: alcanza para que la pregunta
+    // entre en un renglón y deja los marcadores alineados en una columna.
+    flex: 0 0 90%;
     margin: 0;
     font-size: var(--text-lg);
     font-weight: 500;
@@ -36,6 +41,30 @@
 
   &:hover h3 {
     color: var(--accent);
+  }
+}
+
+@include bp.below(sm) {
+  .question {
+    justify-content: space-between;
+    gap: var(--space-4);
+
+    // En un teléfono el 90% no deja lugar para el marcador: el texto vuelve a
+    // ocupar lo que haya y el signo se apoya en el borde.
+    h3 {
+      flex: 0 1 auto;
+      font-size: var(--text-base);
+    }
+  }
+
+  // El hueco que deja el marcador a la derecha sólo tiene sentido mientras
+  // sobre ancho: en un teléfono se lo lleva la respuesta.
+  .answer {
+    padding-right: 0;
+  }
+
+  .still-asking {
+    line-height: 2;
   }
 }
 
@@ -70,10 +99,30 @@
   }
 }
 
+/*
+ * Despliegue de la respuesta. `::details-content` envuelve todo lo que el
+ * navegador revela al abrir: animar su alto de 0 a `auto` se apoya en
+ * `interpolate-size: allow-keywords` (declarado en :root), y la visibilidad del
+ * contenido cambia de golpe recién al final para no recortar el plegado.
+ * Donde el navegador no conoce el pseudo-elemento, la pregunta abre de una: el
+ * comportamiento no depende de la animación.
+ */
+.item::details-content {
+  block-size: 0;
+  overflow: hidden;
+  transition:
+    block-size var(--duration-base) var(--ease),
+    content-visibility var(--duration-base) var(--ease) allow-discrete;
+}
+
+.item[open]::details-content {
+  block-size: auto;
+}
+
 .answer {
   margin: 0;
   padding: 0 var(--space-7) var(--space-5) 0;
-  max-width: 44rem;
+  max-width: 64rem;
   font-size: 0.98rem;
   line-height: 1.7;
   color: var(--steel);

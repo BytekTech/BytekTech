@@ -12,7 +12,7 @@ export const TYPEWRITER_START: TypewriterState = { phrase: 0, length: 0, phase: 
 
 const TYPE_MS = 120;
 const DELETE_MS = 60;
-const HOLD_MS = 2200;
+const HOLD_MS = 1100;
 /** Respiro entre borrar del todo y empezar la frase siguiente. */
 const SWITCH_MS = 400;
 

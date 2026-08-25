@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 :host {
   position: sticky;
   top: 0;
@@ -66,7 +68,12 @@
   font-size: 0.78rem;
 
   button {
-    padding: 0.25rem 0.15rem;
+    display: inline-flex;
+    align-items: center;
+    // El mismo alto que el resto de los botones de la barra: con el dedo, un
+    // texto de dos letras necesita blanco propio para poder tocarse.
+    min-height: 2.25rem;
+    padding: 0.25rem var(--space-2);
     border: 0;
     background: none;
     color: var(--steel);
@@ -175,11 +182,41 @@
   }
 }
 
+/*
+ * Despliegue del menú móvil. La altura se anima con una fila de grilla que va
+ * de 0fr a 1fr: así el navegador interpola hasta el alto real del contenido,
+ * sin fijar un max-height inventado que corte los enlaces o frene la animación
+ * a mitad de camino. Cerrado, `visibility: hidden` lo saca del foco y del
+ * lector de pantalla; al ser una propiedad de pasos, su transición lo mantiene
+ * visible hasta que el plegado termina y lo muestra apenas empieza el abierto.
+ */
 .menu {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  border-top: 1px solid transparent;
+  transition:
+    grid-template-rows var(--duration-base) var(--ease),
+    border-color var(--duration-base) var(--ease),
+    visibility var(--duration-base);
+
+  &.open {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    border-top-color: var(--line);
+  }
+}
+
+// Recorta el contenido mientras la fila crece; el padding va adentro para que
+// no sostenga alto propio con el menú cerrado.
+.menu-viewport {
+  overflow: hidden;
+}
+
+.menu-links {
   display: flex;
   flex-direction: column;
   padding: var(--space-2) var(--space-6) var(--space-5);
-  border-top: 1px solid var(--line);
 
   a {
     padding: var(--space-4) 0;
@@ -194,13 +231,13 @@
   }
 }
 
-@media (min-width: 56rem) {
+@include bp.from(md) {
   .menu {
     display: none;
   }
 }
 
-@media (max-width: 56rem) {
+@include bp.below(md) {
   .nav {
     display: none;
   }
@@ -208,14 +245,36 @@
   .menu-toggle {
     display: block;
   }
+
+  // En apaisado la pantalla mide menos de alto que el menú desplegado: se
+  // recorta a lo que queda bajo la barra y el resto se desplaza.
+  .menu.open .menu-viewport {
+    max-height: calc(100dvh - var(--header-height));
+    overflow-y: auto;
+  }
 }
 
-@media (max-width: 45rem) {
+@include bp.below(sm) {
   .header {
     padding: 0 1.25rem;
   }
 
-  .menu {
+  .menu-links {
     padding-inline: 1.25rem;
+  }
+}
+
+@include bp.below(xs) {
+  .header {
+    gap: var(--space-4);
+    padding: 0 var(--space-4);
+  }
+
+  .actions {
+    gap: var(--space-3);
+  }
+
+  .menu-links {
+    padding-inline: var(--space-4);
   }
 }

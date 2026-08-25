@@ -2,11 +2,9 @@
   <a class="wordmark" [href]="'/' + lang()">bytek<span class="bit" aria-hidden="true"></span></a>
 
   <nav class="nav" [attr.aria-label]="t().footer.navLabel">
-    <a href="#servicios">{{ t().nav.services }}</a>
-    <a href="#clientes">{{ t().nav.clients }}</a>
-    <a href="#proceso">{{ t().nav.process }}</a>
-    <a href="#preguntas">{{ t().nav.faq }}</a>
-    <a href="#contacto">{{ t().nav.contact }}</a>
+    @for (section of sections; track section.fragment) {
+      <a [href]="anchor(section.fragment)">{{ t().nav[section.label] }}</a>
+    }
   </nav>
 
   <div class="actions">
@@ -62,12 +60,21 @@
   </div>
 </header>
 
-@if (isMenuOpen()) {
-  <nav id="header-menu" class="menu" [attr.aria-label]="t().footer.navLabel">
-    <a href="#servicios" (click)="closeMenu()">{{ t().nav.services }}</a>
-    <a href="#clientes" (click)="closeMenu()">{{ t().nav.clients }}</a>
-    <a href="#proceso" (click)="closeMenu()">{{ t().nav.process }}</a>
-    <a href="#preguntas" (click)="closeMenu()">{{ t().nav.faq }}</a>
-    <a href="#contacto" (click)="closeMenu()">{{ t().nav.contact }}</a>
-  </nav>
-}
+<!--
+  El menú vive siempre en el DOM para poder animar también el cierre: cerrado
+  mide cero y queda oculto a la vista y al teclado, no borrado.
+-->
+<nav
+  id="header-menu"
+  class="menu"
+  [class.open]="isMenuOpen()"
+  [attr.aria-label]="t().footer.navLabel"
+>
+  <div class="menu-viewport">
+    <div class="menu-links">
+      @for (section of sections; track section.fragment) {
+        <a [href]="anchor(section.fragment)" (click)="closeMenu()">{{ t().nav[section.label] }}</a>
+      }
+    </div>
+  </div>
+</nav>

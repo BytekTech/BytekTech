@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { Lang } from '../../../domain/models/language.model';
 import { LanguageService } from '../../../application/language.service';
 import { ThemeService } from '../../../application/theme.service';
+import { NAV_SECTIONS } from '../nav-sections';
 
 @Component({
   selector: 'app-header',
@@ -20,11 +21,17 @@ export class HeaderComponent {
   readonly lang = this.language.lang;
   readonly theme = this.themeService.theme;
   readonly isMenuOpen = signal(false);
+  readonly sections = NAV_SECTIONS;
 
   /** El botón anuncia adónde lleva, no dónde está: es una acción, no un estado. */
   readonly themeActionLabel = computed(() =>
     this.theme() === 'dark' ? this.t().theme.toLight : this.t().theme.toDark,
   );
+
+  /** Enlace a una sección del home, válido también desde otra página. */
+  anchor(fragment: string): string {
+    return this.language.anchor(fragment);
+  }
 
   setLang(lang: Lang): void {
     this.language.set(lang);

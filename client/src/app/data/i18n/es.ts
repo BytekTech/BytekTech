@@ -29,14 +29,13 @@ export const ES: Translations = {
       'Bytek Technology acompaña a empresas desde la idea hasta producción: productos digitales, plataformas web y sistemas internos que funcionan.',
     ctaPrimary: 'Empezar un proyecto',
     ctaSecondary: 'Ver clientes',
-    stripLabel: 'servicios',
-    stripItems: 'web · producto · cloud · datos',
   },
   services: {
     eyebrow: 'servicios',
     title: 'Qué construimos',
     subtitle:
-      'Cuatro frentes que se combinan según lo que necesite tu operación. No vendemos horas: entregamos software funcionando.',
+      'Tres frentes que se combinan según lo que necesite tu operación. No vendemos horas: entregamos software funcionando.',
+    disciplines: ['web', 'producto', 'datos'],
     deliverablesLabel: 'incluye',
   },
   metrics: {
@@ -48,7 +47,7 @@ export const ES: Translations = {
     title: 'Con quiénes trabajamos',
     subtitle:
       'Empresas que nos confiaron el software del que depende su operación, y que siguen con nosotros.',
-    sinceLabel: 'desde',
+    carouselLabel: 'Clientes de Bytek, en movimiento continuo',
   },
   process: {
     eyebrow: 'proceso',
@@ -90,11 +89,25 @@ export const ES: Translations = {
     greeting: 'Hola, soy el asistente de Bytek. Elegí una pregunta y te cuento.',
     prompt: 'preguntas frecuentes',
   },
+  terms: {
+    meta: {
+      title: 'Términos y condiciones — Bytek Technology',
+      description:
+        'Condiciones de uso del sitio de Bytek Technology: propiedad intelectual, tratamiento de datos personales, responsabilidad y jurisdicción.',
+    },
+    eyebrow: 'legales',
+    title: 'Términos y condiciones',
+    intro:
+      'Las reglas de uso de este sitio, qué hacemos con los datos que nos dejás y qué ley se aplica si algo se discute.',
+    updatedLabel: 'Última actualización',
+    back: 'Volver al inicio',
+  },
   footer: {
-    tagline: 'Ingeniería de software a medida, de la idea a producción.',
+    tagline: 'Soluciones tecnológicas a medida, de la idea a producción.',
     navLabel: 'Secciones',
     contactLabel: 'Contacto',
     followLabel: 'Seguinos',
+    terms: 'Términos y condiciones',
     rights: 'Todos los derechos reservados.',
   },
 };

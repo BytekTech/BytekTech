@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .footer {
   background: var(--invert-bg);
   color: var(--invert-fg);
@@ -84,15 +86,32 @@
   color: var(--invert-muted);
 }
 
-@media (max-width: 60rem) {
+.legal {
+  color: var(--invert-muted);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  transition: color var(--duration-fast) var(--ease);
+
+  &:hover {
+    color: var(--invert-fg);
+  }
+}
+
+@include bp.below(lg) {
   .top {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-7) var(--space-6);
   }
 }
 
-@media (max-width: 34rem) {
+@include bp.below(xs) {
   .top {
     grid-template-columns: 1fr;
+  }
+
+  // Apilado, el pie es una lista larga: la línea final necesita respirar de la
+  // anterior en lugar de quedar pegada al último enlace.
+  .bottom {
+    gap: var(--space-2);
   }
 }

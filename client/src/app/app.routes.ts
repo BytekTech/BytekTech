@@ -1,12 +1,29 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './presentation/pages/home/home.component';
-import { preferredLang } from './application/language.service';
+import { TermsComponent } from './presentation/pages/terms/terms.component';
+import { LEGACY_TERMS_SLUGS, pathFor, routeFor } from './application/i18n/site-pages';
 
-// Un one-page por idioma: cada ruta se prerenderiza por separado, de modo que
-// tanto el español como el inglés existen para los buscadores.
+/**
+ * Un one-page más las páginas sueltas que cuelgan de él. El idioma ya no viaja
+ * en la URL, así que cada página tiene una sola dirección; las rutas viejas
+ * —las que llevaban el idioma adelante— siguen resolviendo con un redirect,
+ * para que ningún enlace ya compartido termine en un 404.
+ */
 export const routes: Routes = [
-  { path: 'es', component: HomeComponent },
-  { path: 'en', component: HomeComponent },
-  { path: '', pathMatch: 'full', redirectTo: () => `/${preferredLang()}` },
-  { path: '**', redirectTo: () => `/${preferredLang()}` },
+  { path: '', pathMatch: 'full', component: HomeComponent },
+  { path: routeFor('terms'), component: TermsComponent },
+  ...LEGACY_TERMS_SLUGS.filter((slug) => slug !== routeFor('terms')).map((slug) => ({
+    path: slug,
+    redirectTo: pathFor('terms'),
+  })),
+  // El panel se carga aparte: no tiene por qué viajar en el bundle de quien
+  // sólo entra a leer el sitio.
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./presentation/pages/admin/admin.component').then((m) => m.AdminComponent),
+  },
+  { path: 'es', pathMatch: 'full' as const, redirectTo: '/' },
+  { path: 'en', pathMatch: 'full' as const, redirectTo: '/' },
+  { path: '**', redirectTo: '/' },
 ];

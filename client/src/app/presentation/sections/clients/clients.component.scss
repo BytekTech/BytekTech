@@ -1,18 +1,96 @@
+@use 'breakpoints' as bp;
+
 .clients {
   border-top: 1px solid var(--line);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+.section-inner {
+  padding-bottom: var(--space-7);
+}
+
+// Las cintas cruzan la pantalla de lado a lado: encerrarlas en el ancho del
+// contenido delataría el corte y les quitaría el aire de marquesina. Los
+// extremos se desvanecen para que las marcas entren y salgan sin cortarse.
+.viewport {
+  display: flex;
+  flex-direction: column;
+  // Sin esto las cintas se estirarían al alto del contenedor en vez de medir
+  // lo que mide su contenido.
+  align-items: flex-start;
   gap: var(--space-5);
+  overflow: hidden;
+  // El recorte de la cinta le comía el borde a la marca agrandada: el aire de
+  // arriba y de abajo es el que necesita para crecer, sombra incluida.
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-9);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--fade),
+    #000 calc(100% - var(--fade)),
+    transparent
+  );
+
+  --fade: 8rem;
+}
+
+.track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-5);
+  width: max-content;
   margin: 0;
   padding: 0;
   list-style: none;
+  // El gesto horizontal es del carrusel; el vertical sigue siendo de la página.
+  touch-action: pan-y;
+  cursor: grab;
+  will-change: transform;
+
+  &.grabbed {
+    cursor: grabbing;
+    user-select: none;
+  }
 }
 
-@media (max-width: 52rem) {
-  .grid {
-    grid-template-columns: 1fr;
+.slot {
+  flex: 0 0 auto;
+  width: 15rem;
+
+  // Al agrandarse, la marca pasa por encima de sus vecinas en vez de meterse
+  // debajo: son hermanas en la misma cinta y el orden del DOM las apilaría.
+  &:hover {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@include bp.below(lg) {
+  .viewport {
+    --fade: 4rem;
+  }
+
+  .slot {
+    width: 13rem;
+  }
+}
+
+@include bp.below(sm) {
+  .viewport {
+    padding-bottom: var(--space-8);
+  }
+}
+
+@include bp.below(xs) {
+  .viewport {
+    --fade: 2rem;
+  }
+
+  .track {
+    gap: var(--space-4);
+  }
+
+  .slot {
+    width: 11.5rem;
   }
 }

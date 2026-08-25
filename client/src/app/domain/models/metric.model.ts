@@ -9,7 +9,9 @@ export interface MetricCopy {
 export interface Metric {
   id: string;
   value: number;
-  /** Sufijo o prefijo del número: '+', '%', 'sem'. */
+  /** Signo que antecede al número: '+', '~'. */
+  prefix?: string;
+  /** Unidad o matiz que sigue al número: '%', '/10', ' h'. */
   suffix?: string;
   copy: Record<Lang, MetricCopy>;
 }

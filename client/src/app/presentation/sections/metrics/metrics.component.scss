@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .metrics {
   // La misma grilla técnica del hero, invertida sobre fondo tinta.
   background-image:
@@ -38,8 +40,10 @@
   color: var(--invert-accent);
 }
 
-.suffix {
-  font-size: 0.5em;
+// Prefijo y sufijo acompañan a la cifra: se leen a la par, un escalón por
+// debajo, sin quedar en letra chica.
+.affix {
+  font-size: 0.7em;
   letter-spacing: 0;
 }
 
@@ -52,15 +56,16 @@
   color: var(--invert-muted);
 }
 
-@media (max-width: 64rem) {
+@include bp.below(lg) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-5);
   }
 }
 
-@media (max-width: 34rem) {
+@include bp.below(xs) {
   .grid {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 }

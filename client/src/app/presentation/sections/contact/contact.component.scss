@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .contact {
   border-top: 1px solid var(--line);
 }
@@ -97,7 +99,7 @@
   }
 }
 
-@media (max-width: 52rem) {
+@include bp.below(md) {
   .contact .section-inner {
     grid-template-columns: 1fr;
     gap: 2.5rem;
@@ -105,6 +107,21 @@
 
   .note {
     margin-top: 1.25rem;
+  }
+}
+
+@include bp.below(sm) {
+  .field {
+    input,
+    textarea {
+      // Por debajo de 16 px, iOS agranda la página al enfocar el campo y ya no
+      // la devuelve: el formulario se completa con la pantalla corrida.
+      font-size: 1rem;
+    }
+  }
+
+  .direct {
+    margin-top: var(--space-7);
   }
 }
 

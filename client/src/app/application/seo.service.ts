@@ -1,8 +1,9 @@
-import { DOCUMENT, effect, inject, Injectable } from '@angular/core';
+import { computed, DOCUMENT, effect, inject, Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { Lang, SUPPORTED_LANGS } from '../domain/models/language.model';
 import { COMPANY_INFO } from './company.token';
 import { LanguageService } from './language.service';
+import { pathFor } from './i18n/site-pages';
 
 const OG_IMAGE_BY_LANG: Record<Lang, string> = {
   es: '/og-image.png',
@@ -18,9 +19,8 @@ const JSON_LD_ID = 'bytek-json-ld';
 
 /**
  * Mantiene sincronizada la metadata indexable con el idioma activo: título,
- * descripción, canonical, alternates hreflang, tarjetas sociales y datos
- * estructurados. Corre también durante el prerender, así cada idioma queda
- * servido con su metadata ya resuelta en el HTML.
+ * descripción, canonical, tarjetas sociales y datos estructurados. Corre
+ * también en el servidor, así el HTML sale con su metadata ya resuelta.
  */
 @Injectable({ providedIn: 'root' })
 export class SeoService {
@@ -30,12 +30,18 @@ export class SeoService {
   private readonly language = inject(LanguageService);
   private readonly company = inject(COMPANY_INFO);
 
+  /** Cada página lleva su propio título y descripción indexables. */
+  private readonly pageMeta = computed(() => {
+    const translations = this.language.t();
+    return this.language.page() === 'terms' ? translations.terms.meta : translations.meta;
+  });
+
   constructor() {
-    effect(() => this.apply(this.language.lang(), this.language.t().meta));
+    effect(() => this.apply(this.language.lang(), this.pageMeta()));
   }
 
   private apply(lang: Lang, meta: { title: string; description: string }): void {
-    const url = this.urlFor(lang);
+    const url = this.url();
     const image = `${this.company.siteUrl}${OG_IMAGE_BY_LANG[lang]}`;
 
     this.title.setTitle(meta.title);
@@ -54,17 +60,15 @@ export class SeoService {
     this.meta.updateTag({ name: 'twitter:description', content: meta.description });
     this.meta.updateTag({ name: 'twitter:image', content: image });
 
+    // Sin idioma en la URL hay una sola dirección por página: no existen
+    // versiones alternas que declarar con hreflang.
     this.setLink('canonical', url);
-    for (const alternate of SUPPORTED_LANGS) {
-      this.setLink('alternate', this.urlFor(alternate), alternate);
-    }
-    this.setLink('alternate', this.urlFor('es'), 'x-default');
 
     this.setJsonLd(url, meta.description);
   }
 
-  private urlFor(lang: Lang): string {
-    return `${this.company.siteUrl}${this.language.pathFor(lang)}`;
+  private url(): string {
+    return `${this.company.siteUrl}${pathFor(this.language.page())}`;
   }
 
   /** Crea o actualiza un <link> del head, identificándolo por rel + hreflang. */

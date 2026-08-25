@@ -1,0 +1,41 @@
+@use 'sass:map';
+
+/*
+ * Escala de cortes del sitio.
+ *
+ * En rem, no en píxeles: así los cortes acompañan a quien agranda la letra del
+ * navegador en lugar de dejarle el diseño de escritorio en una pantalla que ya
+ * no le entra. Cuatro escalones alcanzan para todo el sitio; más que eso son
+ * variantes que nadie mantiene y que terminan contradiciéndose entre secciones.
+ */
+$breakpoints: (
+  // Portátil chico y tablet apaisada: caen las grillas de tres y cuatro columnas.
+  lg: 64rem,
+  // Tablet vertical: la navegación pasa a botón de menú.
+  md: 56rem,
+  // Teléfono grande: la página pasa a una sola columna y achica los márgenes.
+  sm: 45rem,
+  // Teléfono angosto: último ajuste antes de los 320 px.
+  xs: 34rem
+);
+
+@function width($name) {
+  @if not map.has-key($breakpoints, $name) {
+    @error 'Corte desconocido: #{$name}. Los definidos son #{map.keys($breakpoints)}.';
+  }
+  @return map.get($breakpoints, $name);
+}
+
+/** Desde ese ancho hacia abajo. */
+@mixin below($name) {
+  @media (max-width: width($name)) {
+    @content;
+  }
+}
+
+/** Desde ese ancho hacia arriba: un píxel de más para no pisarse con `below`. */
+@mixin from($name) {
+  @media (min-width: width($name) + 0.0625rem) {
+    @content;
+  }
+}

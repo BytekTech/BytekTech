@@ -16,7 +16,7 @@ import { ClientsComponent } from '../../sections/clients/clients.component';
 import { ProcessComponent } from '../../sections/process/process.component';
 import { FaqComponent } from '../../sections/faq/faq.component';
 import { ContactComponent } from '../../sections/contact/contact.component';
-import { scrambleFrames } from './scramble';
+import { pairWords, scrambleFrames } from './scramble';
 import {
   nextTypewriterState,
   TYPEWRITER_START,
@@ -24,6 +24,14 @@ import {
   typewriterDelay,
   typewriterText,
 } from './typewriter';
+
+/*
+ * Estas animaciones no consultan `prefers-reduced-motion`. En Windows esa
+ * preferencia se enciende al apagar los efectos visuales del sistema —algo que
+ * se hace por rendimiento, sin intención de desactivar nada en la web—, y el
+ * sitio quedaba quieto en máquinas donde nadie lo había pedido. Es una decisión
+ * tomada a conciencia, no un olvido.
+ */
 
 const FRAME_MS = 45;
 /** El remate espera a que el título termine de decodificarse. */
@@ -61,11 +69,19 @@ export class HomeComponent {
   private readonly scrambledTitle = signal<string | null>(null);
   private readonly typed = signal<TypewriterState | null>(null);
 
-  readonly displayTitle = computed(() => this.scrambledTitle() ?? this.t().hero.title);
+  private readonly displayTitle = computed(() => this.scrambledTitle() ?? this.t().hero.title);
 
   /**
-   * Antes de hidratar —y con movimiento reducido— se muestra el primer remate
-   * completo: el HTML servido siempre trae una frase legible y con sentido.
+   * El título, palabra por palabra. Cada palabra reserva en el renglón el lugar
+   * de su versión definitiva: el ruido del decodificado no mide lo mismo que
+   * las letras finales y, sin ese lugar reservado, el título rearmaba los
+   * renglones en cada cuadro y el bloque entero bailaba.
+   */
+  readonly titleWords = computed(() => pairWords(this.t().hero.title, this.displayTitle()));
+
+  /**
+   * Antes de hidratar se muestra el primer remate completo: el HTML servido
+   * siempre trae una frase legible y con sentido.
    */
   readonly displayAccent = computed(() => {
     const accents = this.t().hero.titleAccents;
@@ -101,7 +117,7 @@ export class HomeComponent {
   constructor() {
     effect(() => {
       const { title, titleAccents } = this.t().hero;
-      if (!this.isBrowser || this.prefersReducedMotion()) {
+      if (!this.isBrowser) {
         return;
       }
       this.clearTimers();
@@ -110,10 +126,6 @@ export class HomeComponent {
     });
 
     inject(DestroyRef).onDestroy(() => this.clearTimers());
-  }
-
-  private prefersReducedMotion(): boolean {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   /** Reproduce el decodificado del título y devuelve el control al texto real. */

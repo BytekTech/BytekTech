@@ -1,7 +1,30 @@
-import { scrambleFrames } from './scramble';
+import { pairWords, scrambleFrames } from './scramble';
 
 // random() fijo en 0 ⇒ siempre el primer carácter del pool: '0'.
 const alwaysFirst = () => 0;
+
+describe('pairWords', () => {
+  it('empareja cada palabra con la que se está mostrando', () => {
+    expect(pairWords('hola mundo', 'hola #<>{}')).toEqual([
+      { final: 'hola', current: 'hola' },
+      { final: 'mundo', current: '#<>{}' },
+    ]);
+  });
+
+  it('cae en el texto definitivo si las palabras no coinciden en largo', () => {
+    expect(pairWords('hola mundo', 'otro tex')).toEqual([
+      { final: 'hola', current: 'otro' },
+      { final: 'mundo', current: 'mundo' },
+    ]);
+  });
+
+  it('cae en el texto definitivo si faltan palabras', () => {
+    expect(pairWords('hola mundo', 'hola')).toEqual([
+      { final: 'hola', current: 'hola' },
+      { final: 'mundo', current: 'mundo' },
+    ]);
+  });
+});
 
 describe('scrambleFrames', () => {
   it('revela el texto de izquierda a derecha', () => {

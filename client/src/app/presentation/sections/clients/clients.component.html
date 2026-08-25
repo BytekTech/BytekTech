@@ -8,11 +8,26 @@
       <h2 class="section-title">{{ t().clients.title }}</h2>
       <p class="section-subtitle">{{ t().clients.subtitle }}</p>
     </header>
+  </div>
 
-    <ul class="grid">
+  <div class="viewport" role="group" [attr.aria-label]="t().clients.carouselLabel">
+    <ul class="track" appMarquee>
       @for (client of clients(); track client.id) {
-        <li>
-          <app-client-card [client]="client" />
+        <li class="slot">
+          <app-client-mark [client]="client" />
+        </li>
+      }
+    </ul>
+
+    <!--
+      La cinta de abajo lleva las mismas marcas al revés y corre en sentido
+      contrario: es refuerzo visual, no información nueva, así que no se anuncia
+      ni se tabula por segunda vez.
+    -->
+    <ul class="track" appMarquee marqueeDirection="right" aria-hidden="true">
+      @for (client of clientsReversed(); track client.id) {
+        <li class="slot">
+          <app-client-mark [client]="client" />
         </li>
       }
     </ul>

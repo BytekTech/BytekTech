@@ -1,0 +1,35 @@
+<article class="terms">
+  <div class="section-inner">
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().terms.eyebrow }}
+      </p>
+      <h1 class="section-title">{{ t().terms.title }}</h1>
+      <p class="section-subtitle">{{ t().terms.intro }}</p>
+
+      @if (updatedOn()) {
+        <p class="updated">
+          {{ t().terms.updatedLabel }}
+          <time [attr.datetime]="terms().updatedAt">{{ updatedOn() }}</time>
+        </p>
+      }
+    </header>
+
+    <ol class="clauses">
+      @for (clause of terms().clauses; track clause.id) {
+        <li class="clause">
+          <h2 class="clause-heading">{{ clause.copy[lang()].heading }}</h2>
+          @for (paragraph of clause.copy[lang()].paragraphs; track paragraph) {
+            <p class="clause-text">{{ paragraph }}</p>
+          }
+        </li>
+      }
+    </ol>
+
+    <a class="btn btn-ghost back" [href]="homePath">
+      <span aria-hidden="true">←</span>
+      {{ t().terms.back }}
+    </a>
+  </div>
+</article>

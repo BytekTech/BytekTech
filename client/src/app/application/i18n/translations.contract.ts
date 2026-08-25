@@ -37,13 +37,13 @@ export interface Translations {
     subtitle: string;
     ctaPrimary: string;
     ctaSecondary: string;
-    stripLabel: string;
-    stripItems: string;
   };
   services: {
     eyebrow: string;
     title: string;
     subtitle: string;
+    /** Frentes de trabajo, en una línea: acompañan al eyebrow del lado derecho. */
+    disciplines: readonly string[];
     deliverablesLabel: string;
   };
   metrics: {
@@ -54,7 +54,8 @@ export interface Translations {
     eyebrow: string;
     title: string;
     subtitle: string;
-    sinceLabel: string;
+    /** Etiqueta accesible de la cinta de clientes: sin ella es una lista sin nombre. */
+    carouselLabel: string;
   };
   process: {
     eyebrow: string;
@@ -95,11 +96,24 @@ export interface Translations {
     greeting: string;
     prompt: string;
   };
+  terms: {
+    /** Metadata propia de la página: no comparte título con el one-page. */
+    meta: {
+      title: string;
+      description: string;
+    };
+    eyebrow: string;
+    title: string;
+    intro: string;
+    updatedLabel: string;
+    back: string;
+  };
   footer: {
     tagline: string;
     navLabel: string;
     contactLabel: string;
     followLabel: string;
+    terms: string;
     rights: string;
   };
 }

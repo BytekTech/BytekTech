@@ -1,3 +1,5 @@
+@use './styles/breakpoints' as bp;
+
 /* Bytek Technology — fuentes self-hosted (subset latin, variables) */
 @font-face {
   font-family: 'Space Grotesk';
@@ -186,16 +188,32 @@
 
 html {
   scroll-behavior: smooth;
+  // La barra de desplazamiento se oculta a la vista: el scroll sigue
+  // funcionando igual, con rueda, gesto, teclado y barra espaciadora.
+  scrollbar-width: none;
+  // Sin esto el ancla queda tapada por la cabecera fija y parece que no anduvo.
   scroll-padding-top: var(--header-height);
+  // Habilita animar de 0 a `auto`: lo aprovecha el despliegue de las preguntas.
+  interpolate-size: allow-keywords;
 }
 
 body {
   margin: 0;
+  scrollbar-width: none;
+  // Una palabra sin espacios —un correo, una URL— no puede empujar la página
+  // a lo ancho en una pantalla angosta.
+  overflow-wrap: break-word;
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* La misma barra oculta en los navegadores WebKit, que no leen `scrollbar-width`. */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 a {
@@ -365,7 +383,13 @@ button {
   }
 }
 
-@media (max-width: 45rem) {
+@include bp.below(sm) {
+  :root {
+    // Una barra de 72 px se come demasiada pantalla en un teléfono, y con ella
+    // viaja el scroll-padding de las anclas.
+    --header-height: 3.9rem;
+  }
+
   .section-inner {
     padding: var(--space-8) 1.25rem;
   }
@@ -375,32 +399,24 @@ button {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
+@include bp.below(xs) {
+  .section-inner {
+    padding: var(--space-7) var(--space-4);
   }
 
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-
-  // El parpadeo del cursor se conserva: no desplaza nada en pantalla y late al
-  // mismo ritmo que el cursor de cualquier campo de texto del sistema.
-  .caret,
-  .bit {
-    animation-duration: 1.06s !important;
-    animation-iteration-count: infinite !important;
-  }
-
-  // El cruce entre temas sí se desactiva: es un cambio de toda la pantalla.
-  .theme-transition,
-  .theme-transition *,
-  .theme-transition *::before,
-  .theme-transition *::after {
-    transition-duration: 0.01ms !important;
+  // A este ancho un botón suelto queda flotando: los llamados a la acción se
+  // estiran y se apilan, que además da un blanco más grande para el dedo.
+  .btn {
+    justify-content: center;
+    width: 100%;
   }
 }
+
+/*
+ * El sitio no atenúa su movimiento con `prefers-reduced-motion`. En Windows esa
+ * preferencia se enciende al apagar los efectos visuales del sistema —algo que
+ * se hace por rendimiento, sin intención de desactivar nada en la web—, y con
+ * ella se apagaban el scroll suave de las anclas, el cruce entre temas y las
+ * cintas de clientes en máquinas donde nadie lo había pedido. Es una decisión
+ * tomada a conciencia, no un olvido.
+ */

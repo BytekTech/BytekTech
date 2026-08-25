@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .process {
   border-top: 1px solid var(--line);
   background: var(--surface-sunken);
@@ -61,14 +63,15 @@
   color: var(--steel);
 }
 
-@media (max-width: 64rem) {
+@include bp.below(lg) {
   .steps {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 40rem) {
+@include bp.below(sm) {
   .steps {
     grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
 }

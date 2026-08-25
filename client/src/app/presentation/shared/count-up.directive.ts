@@ -11,14 +11,21 @@ import { countUpValue } from './count-up';
 
 const DURATION_MS = 1400;
 
+/*
+ * Estas animaciones no consultan `prefers-reduced-motion`. En Windows esa
+ * preferencia se enciende al apagar los efectos visuales del sistema —algo que
+ * se hace por rendimiento, sin intención de desactivar nada en la web—, y el
+ * sitio quedaba quieto en máquinas donde nadie lo había pedido. Es una decisión
+ * tomada a conciencia, no un olvido.
+ */
+
 /**
  * Cuenta desde cero hasta el valor indicado la primera vez que el elemento
  * entra en pantalla.
  *
  * El valor final es también el valor inicial: así el HTML prerenderizado ya
  * trae la cifra —legible sin JavaScript y para los buscadores— y la animación
- * sólo la reemplaza una vez hidratada. Quien pidió menos movimiento nunca ve
- * el conteo.
+ * sólo la reemplaza una vez hidratada.
  */
 @Directive({
   selector: '[appCountUp]',
@@ -37,16 +44,9 @@ export class CountUpDirective {
 
   constructor() {
     afterNextRender(() => {
-      if (this.prefersReducedMotion()) {
-        return;
-      }
       this.display.set(0);
       this.observeEntrance();
     });
-  }
-
-  private prefersReducedMotion(): boolean {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   private observeEntrance(): void {

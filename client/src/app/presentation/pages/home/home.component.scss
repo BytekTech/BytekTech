@@ -1,3 +1,5 @@
+@use 'breakpoints' as bp;
+
 .hero {
   position: relative;
   display: flex;
@@ -65,6 +67,30 @@
   line-height: 1.06;
   letter-spacing: -0.03em;
   color: var(--ink);
+  // Un remate largo no debe empujar el título fuera de la columna.
+  overflow-wrap: break-word;
+
+  /*
+   * Cada palabra del título reserva el lugar de su versión definitiva y el
+   * decodificado se pinta encima. Sin ese lugar reservado, el ruido —que no
+   * mide lo mismo que las letras— rearmaba los renglones en cada cuadro y el
+   * título se corría de lugar mientras se acomodaba.
+   */
+  .word {
+    position: relative;
+    display: inline-block;
+  }
+
+  .word-ghost {
+    visibility: hidden;
+  }
+
+  .word-live {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+  }
 
   /*
    * El remate ocupa su propio renglón y su hueco reserva el ALTO del remate
@@ -167,46 +193,38 @@
   color: var(--accent);
 }
 
-.strip {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 76rem;
-  margin: 0 auto;
-  padding: 1.4rem 2rem;
-  border-top: 1px solid var(--line-strong);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--steel);
-
-  .strip-label span {
-    color: var(--accent);
-    margin-right: 0.4em;
-  }
-}
-
-@media (max-width: 64rem) {
+// El motivo binario vive del aire que le sobra al costado del título: sin ese
+// aire estorba, así que se retira antes de encimarse.
+@include bp.below(lg) {
   .bytes {
     display: none;
   }
 }
 
-@media (max-width: 45rem) {
+@include bp.below(sm) {
   .hero-inner {
     padding: var(--space-7) 1.25rem var(--space-6);
   }
 
   .subtitle {
+    margin-bottom: var(--space-7);
     font-size: 1rem;
   }
+}
 
-  .strip {
-    // El botón del asistente flota sobre esta esquina: se le deja el lugar.
-    padding: 1.2rem 5rem 1.2rem 1.25rem;
-    letter-spacing: 0.12em;
+@include bp.below(xs) {
+  .hero-inner {
+    padding: var(--space-6) var(--space-4) var(--space-6);
+  }
+
+  .title {
+    font-size: clamp(2rem, 9vw, 2.5rem);
+    margin-bottom: var(--space-5);
+  }
+
+  // Los dos llamados a la acción pasan a ancho completo (regla global) y se
+  // apilan: acá el renglón compartido los dejaría en dos líneas desparejas.
+  .actions {
+    gap: var(--space-3);
   }
 }

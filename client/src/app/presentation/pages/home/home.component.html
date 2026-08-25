@@ -7,7 +7,12 @@
       </p>
 
       <h1 class="title">
-        {{ displayTitle() }}
+        @for (word of titleWords(); track $index) {
+          <span class="word"
+            ><span class="word-ghost" aria-hidden="true">{{ word.final }}</span
+            ><span class="word-live">{{ word.current }}</span></span
+          >&ngsp;
+        }
         <span class="accent-slot"
           ><span class="accent-ghost" aria-hidden="true">{{ longestAccent() }}</span
           ><span class="accent-live"
@@ -37,14 +42,6 @@
       }
     </aside>
   </div>
-
-  <footer class="strip">
-    <span class="strip-label">
-      <span aria-hidden="true">//</span>
-      {{ t().hero.stripLabel }}
-    </span>
-    <span class="strip-items">{{ t().hero.stripItems }}</span>
-  </footer>
 </section>
 
 <app-services />

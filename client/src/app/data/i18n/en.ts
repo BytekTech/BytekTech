@@ -34,14 +34,13 @@ export const EN: Translations = {
       'Bytek Technology partners with companies from idea to production: digital products, web platforms and internal systems that work.',
     ctaPrimary: 'Start a project',
     ctaSecondary: 'See clients',
-    stripLabel: 'services',
-    stripItems: 'web · product · cloud · data',
   },
   services: {
     eyebrow: 'services',
     title: 'What we build',
     subtitle:
-      'Four fronts that combine according to what your operation needs. We do not sell hours: we deliver working software.',
+      'Three fronts that combine according to what your operation needs. We do not sell hours: we deliver working software.',
+    disciplines: ['web', 'product', 'data'],
     deliverablesLabel: 'includes',
   },
   metrics: {
@@ -53,7 +52,7 @@ export const EN: Translations = {
     title: 'Who we work with',
     subtitle:
       'Companies that trusted us with the software their operation runs on, and stayed.',
-    sinceLabel: 'since',
+    carouselLabel: 'Bytek clients, on a continuous loop',
   },
   process: {
     eyebrow: 'process',
@@ -95,11 +94,25 @@ export const EN: Translations = {
     greeting: 'Hi, I am the Bytek assistant. Pick a question and I will fill you in.',
     prompt: 'frequently asked questions',
   },
+  terms: {
+    meta: {
+      title: 'Terms and conditions — Bytek Technology',
+      description:
+        'Conditions of use for the Bytek Technology site: intellectual property, personal data processing, liability and jurisdiction.',
+    },
+    eyebrow: 'legal',
+    title: 'Terms and conditions',
+    intro:
+      'The rules for using this site, what we do with the data you leave us, and which law applies if something is disputed.',
+    updatedLabel: 'Last updated',
+    back: 'Back to home',
+  },
   footer: {
-    tagline: 'Custom software engineering, from idea to production.',
+    tagline: 'Custom technology solutions, from idea to production.',
     navLabel: 'Sections',
     contactLabel: 'Contact',
     followLabel: 'Follow us',
+    terms: 'Terms and conditions',
     rights: 'All rights reserved.',
   },
 };

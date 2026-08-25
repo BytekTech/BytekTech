@@ -2,16 +2,15 @@
   <div class="section-inner">
     <div class="top">
       <div class="brand">
-        <span class="wordmark">bytek<span class="bit" aria-hidden="true"></span></span>
+        <span class="wordmark">bytek technology<span class="bit" aria-hidden="true"></span></span>
         <p class="tagline">{{ t().footer.tagline }}</p>
       </div>
 
       <nav class="links" [attr.aria-label]="t().footer.navLabel">
         <p class="links-label">{{ t().footer.navLabel }}</p>
-        <a href="#servicios">{{ t().nav.services }}</a>
-        <a href="#clientes">{{ t().nav.clients }}</a>
-        <a href="#proceso">{{ t().nav.process }}</a>
-        <a href="#preguntas">{{ t().nav.faq }}</a>
+        @for (section of sections; track section.fragment) {
+          <a [href]="anchor(section.fragment)">{{ t().nav[section.label] }}</a>
+        }
       </nav>
 
       <div class="links">
@@ -30,6 +29,7 @@
 
     <div class="bottom">
       <span>© {{ currentYear }} {{ company.legalName }}. {{ t().footer.rights }}</span>
+      <a class="legal" [href]="termsPath">{{ t().footer.terms }}</a>
     </div>
   </div>
 </footer>

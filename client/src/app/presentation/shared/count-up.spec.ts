@@ -1,18 +1,22 @@
-import { countUpValue, easeOutCubic } from './count-up';
+import { countUpValue, easeOutQuint } from './count-up';
 
-describe('easeOutCubic', () => {
+describe('easeOutQuint', () => {
   it('va de 0 a 1 sin pasarse', () => {
-    expect(easeOutCubic(0)).toBe(0);
-    expect(easeOutCubic(1)).toBe(1);
+    expect(easeOutQuint(0)).toBe(0);
+    expect(easeOutQuint(1)).toBe(1);
   });
 
-  it('desacelera: en la mitad del tiempo ya recorrió más de la mitad', () => {
-    expect(easeOutCubic(0.5)).toBeGreaterThan(0.5);
+  it('en el primer tercio del tiempo ya se llevó la mayor parte del recorrido', () => {
+    expect(easeOutQuint(1 / 3)).toBeGreaterThan(0.85);
+  });
+
+  it('deja el último tramo para el final: cerca de llegar apenas se mueve', () => {
+    expect(easeOutQuint(1) - easeOutQuint(0.9)).toBeLessThan(0.01);
   });
 
   it('acota valores fuera de rango', () => {
-    expect(easeOutCubic(-2)).toBe(0);
-    expect(easeOutCubic(9)).toBe(1);
+    expect(easeOutQuint(-2)).toBe(0);
+    expect(easeOutQuint(9)).toBe(1);
   });
 });
 

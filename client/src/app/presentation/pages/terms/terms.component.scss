@@ -1,0 +1,78 @@
+.terms {
+  display: block;
+
+  .section-inner {
+    // Un texto legal se lee en columna angosta; a lo ancho de la página cansa.
+    max-width: 52rem;
+  }
+}
+
+.updated {
+  margin: var(--space-5) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--steel-light);
+}
+
+// La numeración la lleva el contador de la lista: el orden es parte del documento.
+.clauses {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: clause;
+}
+
+.clause {
+  counter-increment: clause;
+  padding-top: var(--space-6);
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--line);
+
+  &:first-child {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: 0;
+  }
+}
+
+.clause-heading {
+  display: flex;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+
+  &::before {
+    content: counter(clause) '.';
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--accent);
+  }
+}
+
+.clause-text {
+  margin: 0 0 var(--space-4);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--steel);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.back {
+  margin-top: var(--space-8);
+
+  span {
+    transition: transform var(--duration-fast) var(--ease);
+  }
+
+  &:hover span {
+    transform: translateX(-3px);
+  }
+}
