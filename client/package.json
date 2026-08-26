@@ -3,11 +3,11 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node --env-file-if-exists=.env node_modules/@angular/cli/bin/ng.js serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:client": "node dist/client/server/server.mjs",
+    "serve:ssr:client": "node --env-file-if-exists=.env dist/client/server/server.mjs",
     "admin:hash": "bun run scripts/hash-admin-password.ts"
   },
   "private": true,

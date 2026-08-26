@@ -189,12 +189,25 @@
  * a mitad de camino. Cerrado, `visibility: hidden` lo saca del foco y del
  * lector de pantalla; al ser una propiedad de pasos, su transición lo mantiene
  * visible hasta que el plegado termina y lo muestra apenas empieza el abierto.
+ *
+ * El menú cuelga de la barra en vez de ocupar lugar en el flujo. Empujando al
+ * contenido, tocar un enlace disparaba dos cosas a la vez —el desplazamiento
+ * suave hacia la sección y el plegado del menú—, y la página terminaba corrida
+ * por el alto del menú: parecía que el enlace no llevaba a ningún lado.
  */
 .menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
   display: grid;
   grid-template-rows: 0fr;
   visibility: hidden;
   border-top: 1px solid transparent;
+  // Opaco, no translúcido como la barra: colgado sobre el contenido, un panel
+  // a medio pintar deja los enlaces peleando con el texto de abajo.
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
   transition:
     grid-template-rows var(--duration-base) var(--ease),
     border-color var(--duration-base) var(--ease),

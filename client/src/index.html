@@ -21,7 +21,9 @@
         if (saved === 'light' || saved === 'dark') {
           document.documentElement.dataset.theme = saved;
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', saved === 'dark' ? '#0b0c0e' : '#f7f7f8');
+          // Los dos valores son los de --paper en styles.scss: si cambian allá,
+          // cambian acá y en theme.service.ts.
+          if (meta) meta.setAttribute('content', saved === 'dark' ? '#1a1c21' : '#f7f7f8');
         }
       } catch (error) {
         // Almacenamiento bloqueado: se sigue con la preferencia del sistema.

@@ -62,7 +62,7 @@ function keepOutOfTabOrder(element: HTMLElement): void {
   selector: '[appMarquee]',
   host: {
     '[class.grabbed]': 'grabbed()',
-    '(pointerenter)': 'hovering.set(true)',
+    '(pointerenter)': 'onPointerEnter($event)',
     '(pointerleave)': 'hovering.set(false)',
     '(pointerdown)': 'startDrag($event)',
     '(pointermove)': 'continueDrag($event)',
@@ -191,6 +191,16 @@ export class MarqueeDirective {
     this.host.nativeElement.style.transform = 'translate3d(' + -this.offset + 'px, 0, 0)';
   }
 
+  /**
+   * Frenar bajo el puntero es cosa del mouse. El dedo no se posa: entra al
+   * tocar y sale al soltar, y si el navegador cancela el gesto para desplazar
+   * la página hay casos en los que la salida nunca llega. La cinta quedaba
+   * detenida para siempre después del primer scroll que pasara por encima.
+   */
+  protected onPointerEnter(event: PointerEvent): void {
+    this.hovering.set(event.pointerType === 'mouse');
+  }
+
   protected startDrag(event: PointerEvent): void {
     if (event.button !== 0 || this.span <= 0) {
       return;
@@ -247,10 +257,14 @@ export class MarqueeDirective {
   }
 
   protected onFocusIn(event: FocusEvent): void {
-    this.focused.set(true);
-
     const target = event.target as HTMLElement | null;
     const viewport = this.host.nativeElement.parentElement;
+
+    // Sólo el foco del teclado detiene la cinta. Un toque sobre una tarjeta
+    // también enfoca su enlace, y en pantallas táctiles nada devuelve ese foco:
+    // la marcha no volvía a arrancar en el resto de la visita.
+    this.focused.set(!!target?.matches(':focus-visible'));
+
     if (!target || !viewport) {
       return;
     }

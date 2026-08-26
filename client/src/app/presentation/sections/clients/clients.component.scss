@@ -22,7 +22,9 @@
   // El recorte de la cinta le comía el borde a la marca agrandada: el aire de
   // arriba y de abajo es el que necesita para crecer, sombra incluida.
   padding-top: var(--space-4);
-  padding-bottom: var(--space-9);
+  // Abajo, además, tiene que caber la ficha que se abre bajo la fila de atrás;
+  // si no, el recorte la parte al medio.
+  padding-bottom: var(--panel-room);
   mask-image: linear-gradient(
     to right,
     transparent,
@@ -32,11 +34,12 @@
   );
 
   --fade: 8rem;
+  --panel-room: 9rem;
 }
 
 .track {
   display: flex;
-  align-items: stretch;
+  align-items: center;
   gap: var(--space-5);
   width: max-content;
   margin: 0;
@@ -51,33 +54,29 @@
     cursor: grabbing;
     user-select: none;
   }
-}
 
-.slot {
-  flex: 0 0 auto;
-  width: 15rem;
-
-  // Al agrandarse, la marca pasa por encima de sus vecinas en vez de meterse
-  // debajo: son hermanas en la misma cinta y el orden del DOM las apilaría.
-  &:hover {
+  // `will-change` deja a cada cinta en su propio plano, así que una marca de la
+  // fila de arriba no puede taparle a la de abajo por su cuenta: el que sube es
+  // el plano entero mientras hay una ficha abierta adentro.
+  &:has(.slot:hover, .slot:focus-within) {
     position: relative;
     z-index: 1;
   }
 }
 
+// Sin tarjeta que las contenga, las marcas necesitan blanco propio para no
+// leerse como una sola mancha: el ancho fijo les da el paso regular de una
+// marquesina y mantiene el mismo pulso venga el nombre que venga.
+.slot {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  width: 7rem;
+}
+
 @include bp.below(lg) {
   .viewport {
     --fade: 4rem;
-  }
-
-  .slot {
-    width: 13rem;
-  }
-}
-
-@include bp.below(sm) {
-  .viewport {
-    padding-bottom: var(--space-8);
   }
 }
 
@@ -91,6 +90,6 @@
   }
 
   .slot {
-    width: 11.5rem;
+    width: 5.5rem;
   }
 }

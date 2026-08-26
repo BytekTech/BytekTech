@@ -1,11 +1,17 @@
 @use 'breakpoints' as bp;
 
+// Las cifras ya tienen peso propio: no necesitan una banda de tinta detrás
+// para separarse. El plano hundido alcanza para que la sección se despegue de
+// la de arriba, y la grilla técnica le deja el aire de hoja de cálculo.
 .metrics {
-  // La misma grilla técnica del hero, invertida sobre fondo tinta.
+  background-color: var(--surface-sunken);
   background-image:
-    linear-gradient(to right, var(--invert-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--invert-line) 1px, transparent 1px);
+    linear-gradient(to right, var(--line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
   background-size: 4.5rem 4.5rem;
+  // Sólo arriba: abajo el borde lo pone la sección de clientes, y los dos
+  // juntos dibujaban una línea de doble grosor.
+  border-top: 1px solid var(--line);
 }
 
 .grid {
@@ -19,14 +25,14 @@
   display: flex;
   flex-direction: column;
   padding-top: var(--space-5);
-  border-top: 1px solid var(--invert-line);
+  border-top: 1px solid var(--line-strong);
 }
 
 .label {
   order: 2;
   font-size: 0.95rem;
   font-weight: 500;
-  color: var(--invert-fg);
+  color: var(--ink);
 }
 
 .value {
@@ -37,7 +43,7 @@
   font-weight: 600;
   line-height: 1;
   letter-spacing: -0.04em;
-  color: var(--invert-accent);
+  color: var(--accent);
 }
 
 // Prefijo y sufijo acompañan a la cifra: se leen a la par, un escalón por
@@ -53,7 +59,7 @@
   font-weight: 400;
   font-size: var(--text-sm);
   line-height: 1.5;
-  color: var(--invert-muted);
+  color: var(--steel);
 }
 
 @include bp.below(lg) {

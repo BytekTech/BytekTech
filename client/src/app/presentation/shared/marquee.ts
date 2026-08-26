@@ -10,8 +10,12 @@ export type MarqueeDirection = 'left' | 'right';
 /** Un cuadro perdido —pestaña en segundo plano, hilo ocupado— no debe volverse un salto. */
 export const MAX_FRAME_MS = 64;
 
-/** Tope de copias del listado: más allá de esto el hueco ya no es el problema. */
-export const MAX_COPIES = 12;
+/**
+ * Tope de copias del listado: más allá de esto el hueco ya no es el problema.
+ * Da para tapar una pantalla ancha aun con una lista de un solo elemento, que
+ * es el caso en el que cada copia mide poco y hacen falta muchas.
+ */
+export const MAX_COPIES = 20;
 
 /**
  * Envuelve una posición dentro del bucle `[0, span)`. Al pasar el final vuelve

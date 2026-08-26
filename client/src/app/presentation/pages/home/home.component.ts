@@ -16,6 +16,8 @@ import { ClientsComponent } from '../../sections/clients/clients.component';
 import { ProcessComponent } from '../../sections/process/process.component';
 import { FaqComponent } from '../../sections/faq/faq.component';
 import { ContactComponent } from '../../sections/contact/contact.component';
+import { bitPattern } from '../../shared/bit-pattern';
+import { decodeFrame, HeroByte, settledColumn, totalDecodeFrames } from './byte-decode';
 import { pairWords, scrambleFrames } from './scramble';
 import {
   nextTypewriterState,
@@ -36,6 +38,8 @@ import {
 const FRAME_MS = 45;
 /** El remate espera a que el título termine de decodificarse. */
 const ACCENT_DELAY_MS = 620;
+/** Un bit por cuadro; algo más lento que el título, que tiene mucho más que resolver. */
+const BYTE_FRAME_MS = 58;
 
 @Component({
   selector: 'app-home',
@@ -57,14 +61,37 @@ export class HomeComponent {
 
   readonly t = this.language.t;
 
-  // "bytek" deletreado en sus propios bytes ASCII
-  readonly bytes = [
+  /**
+   * "bytek" en sus propios bytes, la misma marca generativa que identifica a
+   * cada cliente. Acá se dibuja a escala de cartel: el hero es la firma de la
+   * casa en grande, y las marcas de la cinta de clientes son ese mismo objeto
+   * en miniatura.
+   */
+  readonly watermark = bitPattern('bytek');
+
+  /**
+   * Los mismos bytes, esta vez legibles. Es la clave de lectura de la marca de
+   * agua: sin ella el patrón del fondo es textura y nada más.
+   */
+  private readonly bytes: readonly HeroByte[] = [
     { bits: '01100010', char: 'b' },
     { bits: '01111001', char: 'y' },
     { bits: '01110100', char: 't' },
     { bits: '01100101', char: 'e' },
     { bits: '01101011', char: 'k' },
   ];
+
+  /** Cuadro de la cascada; en nulo la columna se muestra ya resuelta. */
+  private readonly byteFrame = signal<number | null>(null);
+
+  /**
+   * La columna tal como se ve ahora. Antes de hidratar —y una vez terminada la
+   * cascada— es la versión asentada: el HTML servido nunca trae ruido.
+   */
+  readonly decodedBytes = computed(() => {
+    const frame = this.byteFrame();
+    return frame === null ? settledColumn(this.bytes) : decodeFrame(this.bytes, frame);
+  });
 
   private readonly scrambledTitle = signal<string | null>(null);
   private readonly typed = signal<TypewriterState | null>(null);
@@ -122,6 +149,7 @@ export class HomeComponent {
       }
       this.clearTimers();
       this.decodeTitle(title);
+      this.decodeBytes();
       this.timers.push(setTimeout(() => this.typeAccents(titleAccents), ACCENT_DELAY_MS));
     });
 
@@ -145,6 +173,28 @@ export class HomeComponent {
     this.timers.push(interval);
   }
 
+  /**
+   * Agita los bits y los va fijando en cascada. Al llegar al final suelta el
+   * cuadro: la columna vuelve a su versión asentada y no queda ningún
+   * temporizador vivo.
+   */
+  private decodeBytes(): void {
+    const lastFrame = totalDecodeFrames(this.bytes.length);
+    let frame = 0;
+
+    const interval = setInterval(() => {
+      if (frame >= lastFrame) {
+        clearInterval(interval);
+        this.byteFrame.set(null);
+        return;
+      }
+      this.byteFrame.set(++frame);
+    }, BYTE_FRAME_MS);
+
+    this.byteFrame.set(0);
+    this.timers.push(interval);
+  }
+
   /** Ciclo continuo: escribe un remate, lo sostiene, lo borra y sigue con el próximo. */
   private typeAccents(accents: readonly string[]): void {
     const advance = (state: TypewriterState) => {
@@ -164,5 +214,6 @@ export class HomeComponent {
     clearTimeout(this.typewriterTimer);
     this.scrambledTitle.set(null);
     this.typed.set(null);
+    this.byteFrame.set(null);
   }
 }

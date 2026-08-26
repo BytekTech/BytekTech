@@ -1,4 +1,15 @@
 <section class="hero">
+  <!--
+    La firma de la casa a escala de cartel: los 40 bits de "bytek", cortados
+    por el borde derecho. Es el mismo patrón que llevan las marcas de la cinta
+    de clientes, cuarenta veces más grande.
+  -->
+  <div class="watermark" aria-hidden="true">
+    @for (bit of watermark; track $index) {
+      <span class="bit-cell" [class.on]="bit"></span>
+    }
+  </div>
+
   <div class="hero-inner">
     <div class="hero-copy">
       <p class="eyebrow">
@@ -31,16 +42,23 @@
           <span aria-hidden="true">→</span>
         </a>
       </div>
+
     </div>
 
+    <!--
+      La clave de lectura de la marca de agua: los mismos bytes, acá legibles.
+      Los bits se agitan hasta caer y recién entonces aparece la letra. Es
+      decorativo: el nombre de la casa ya está en la cabecera.
+    -->
     <aside class="bytes" aria-hidden="true">
-      @for (byte of bytes; track byte.char) {
-        <div class="byte-row">
+      @for (byte of decodedBytes(); track $index) {
+        <div class="byte">
           <span class="byte-bits">{{ byte.bits }}</span>
-          <span class="byte-char">{{ byte.char }}</span>
+          <span class="byte-char" [class.settled]="byte.settled">{{ byte.char }}</span>
         </div>
       }
     </aside>
+
   </div>
 </section>
 

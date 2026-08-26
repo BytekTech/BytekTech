@@ -26,7 +26,12 @@ function buildEmailHtml(fields: ContactFields): string {
 }
 
 async function sendEmail(fields: ContactFields, apiKey: string, to: string): Promise<boolean> {
-  const from = process.env['CONTACT_FROM_EMAIL'] ?? 'Bytek <onboarding@resend.dev>';
+  // Declarada en blanco no es lo mismo que ausente, y en blanco es justo como
+  // queda una variable que todavía no se completó: `??` la dejaba pasar y el
+  // envío salía sin remitente, que Resend rechaza. El respaldo de prueba sólo
+  // entrega a la casilla dueña de la cuenta; para el resto hace falta un
+  // dominio verificado.
+  const from = process.env['CONTACT_FROM_EMAIL']?.trim() || 'Bytek <onboarding@resend.dev>';
 
   try {
     const response = await fetch('https://api.resend.com/emails', {

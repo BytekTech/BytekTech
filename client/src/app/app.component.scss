@@ -1,0 +1,20 @@
+/*
+ * Cimiento de la página: el pie se apoya siempre en el borde inferior de la
+ * ventana. En las vistas cortas —el panel antes de entrar, los términos en una
+ * pantalla grande, un error— el contenido no llega a llenar el alto, y sin
+ * esto el pie quedaba flotando a media pantalla con papel en blanco debajo.
+ */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/*
+ * Lo que empuja. `flex-grow: 1` reparte al contenido todo el alto sobrante;
+ * `flex-shrink: 0` es el que evita el error opuesto: sin él, una página larga
+ * se comprime para entrar en la ventana en lugar de desbordarla y hacer scroll.
+ */
+main {
+  flex: 1 0 auto;
+}

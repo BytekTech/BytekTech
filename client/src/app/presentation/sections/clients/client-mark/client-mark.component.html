@@ -1,4 +1,4 @@
-<article class="tile" [title]="copy().summary" [style.--brand]="brandColor()">
+<article class="tile" [style.--brand]="brandColor()">
   <div class="mark" aria-hidden="true">
     <div class="pattern">
       @for (bit of bits(); track $index) {
@@ -17,6 +17,6 @@
         {{ client().name }}
       }
     </h3>
-    <p class="industry">{{ copy().industry }}</p>
+    <p class="reason">{{ copy().summary }}</p>
   </div>
 </article>

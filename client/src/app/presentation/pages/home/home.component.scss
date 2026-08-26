@@ -12,24 +12,42 @@
 }
 
 /*
- * Trama técnica: grilla fina con un punto en cada cruce, como un papel
- * cuadriculado de ingeniería. Se desvanece hacia los bordes con una máscara
- * radial para que no llegue plana al título ni corte de golpe contra la
- * sección siguiente.
+ * Marca de agua: "bytek" escrito en sus 40 bits, uno por celda, en la misma
+ * disposición que las marcas de la cinta de clientes —ocho filas por columna,
+ * una columna por letra— pero al tamaño de un cartel.
+ *
+ * Va anclada a la derecha y cortada por el borde: entera y centrada sería un
+ * logo, y esto no es un logo. Cortada es una textura que se reconoce recién
+ * cuando abajo aparecen las marcas de clientes con la misma forma.
  */
-.hero::before {
-  content: '';
+.watermark {
+  // Ocho filas de alto repartidas en el hero, con aire arriba y abajo.
+  --cell: clamp(2.6rem, 8.2vh, 6.4rem);
+  --bit-gap: calc(var(--cell) * 0.16);
+
   position: absolute;
-  inset: 0;
+  top: 50%;
+  right: 0;
   z-index: -2;
-  background-image:
-    radial-gradient(circle at center, var(--grid-dot) 1.5px, transparent 1.6px),
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-  background-size: 4.5rem 4.5rem;
-  background-position: -0.75px -0.75px;
-  -webkit-mask-image: radial-gradient(ellipse 88% 72% at 40% 42%, #000 28%, transparent 100%);
-  mask-image: radial-gradient(ellipse 88% 72% at 40% 42%, #000 28%, transparent 100%);
+  display: grid;
+  grid-template-rows: repeat(8, var(--cell));
+  grid-auto-flow: column;
+  grid-auto-columns: var(--cell);
+  gap: var(--bit-gap);
+  // El corte: la última columna queda afuera de la pantalla.
+  transform: translate(16%, -50%);
+  // Se apaga hacia la izquierda mucho antes de llegar al título: el texto se
+  // lee sobre el papel limpio, nunca sobre las celdas.
+  -webkit-mask-image: linear-gradient(to right, transparent 12%, #000 62%);
+  mask-image: linear-gradient(to right, transparent 12%, #000 62%);
+}
+
+.bit-cell {
+  border-radius: calc(var(--cell) * 0.07);
+
+  &.on {
+    background: var(--watermark);
+  }
 }
 
 /* Halo que levanta el sector donde vive el motivo binario. */
@@ -162,6 +180,11 @@
   gap: 1rem;
 }
 
+/*
+ * Los bytes legibles, al costado del título: la clave de lectura del patrón
+ * que corre de fondo. Van sobre la marca de agua, que a esa altura es la zona
+ * más cargada del hero, así que el renglón se apoya en su propio respaldo.
+ */
 .bytes {
   position: absolute;
   right: 2rem;
@@ -173,7 +196,7 @@
   font-family: var(--font-mono);
 }
 
-.byte-row {
+.byte {
   display: flex;
   align-items: baseline;
   gap: 1.1rem;
@@ -184,13 +207,28 @@
   letter-spacing: 0.32em;
   color: var(--steel);
   opacity: 0.55;
+  // Los dígitos no bailan mientras se agitan: en esta fuente el 1 mide menos
+  // que el 0 y el renglón se acortaba en cada cuadro.
+  font-variant-numeric: tabular-nums;
 }
 
+// La letra aparece recién cuando su byte terminó de caer, y aparece creciendo
+// desde el lugar exacto donde estaba el último bit.
 .byte-char {
   min-width: 1ch;
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--accent);
+  opacity: 0;
+  transform: translateY(0.15em);
+  transition:
+    opacity var(--duration-base) var(--ease),
+    transform var(--duration-base) var(--ease);
+
+  &.settled {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 // El motivo binario vive del aire que le sobra al costado del título: sin ese
@@ -198,6 +236,19 @@
 @include bp.below(lg) {
   .bytes {
     display: none;
+  }
+}
+
+// Sin la columna del título al lado, la marca de agua deja de tener contra qué
+// medirse: se achica y se corre más afuera, para seguir siendo textura de borde
+// y no una mancha en el medio de la pantalla.
+@include bp.below(md) {
+  .watermark {
+    --cell: clamp(2.2rem, 6.4vh, 4rem);
+
+    transform: translate(28%, -50%);
+    -webkit-mask-image: linear-gradient(to right, transparent 4%, #000 52%);
+    mask-image: linear-gradient(to right, transparent 4%, #000 52%);
   }
 }
 
@@ -216,6 +267,7 @@
   .hero-inner {
     padding: var(--space-6) var(--space-4) var(--space-6);
   }
+
 
   .title {
     font-size: clamp(2rem, 9vw, 2.5rem);

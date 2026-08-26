@@ -1,7 +1,7 @@
 @use 'breakpoints' as bp;
 
 .footer {
-  background: var(--invert-bg);
+  background: var(--footer-bg);
   color: var(--invert-fg);
 
   .section-inner {

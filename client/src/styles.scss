@@ -58,12 +58,14 @@
   --accent-wash: #ededef;
   --on-accent: #ffffff;
 
-  /* Bloques invertidos, para dar ritmo al one-page */
-  --invert-bg: #0a0a0b;
+  /* Sobre tinta: los usa el pie, el único bloque que va contra el fondo oscuro */
   --invert-fg: #f7f7f8;
   --invert-muted: #8b9096;
   --invert-line: #22232a;
   --invert-accent: #ffffff;
+
+  /* El pie cierra la página y es el único bloque que llega a la tinta plena. */
+  --footer-bg: #0a0a0b;
 
   /* Estados */
   --error: #b3261e;
@@ -74,43 +76,58 @@
   --grid-line: #e4e5e8;
   --dot: rgb(10 10 11 / 78%);
   --grid-dot: rgb(10 10 11 / 16%);
+  // La marca de agua del hero pinta bloques grandes, no puntos: al tamaño de
+  // un punto el 16% apenas se ve, al de un bloque pesa mucho más. Va por debajo.
+  --watermark: rgb(10 10 11 / 11%);
   --shadow-color: 10 10 11;
 }
 
+/*
+ * El tema oscuro es gris, no negro. Un fondo al borde del #000 deja la página
+ * sin planos —nada puede hundirse por debajo— y en pantallas OLED cada borde
+ * de texto queda con un halo. Trabajar sobre grises deja lugar para las tres
+ * superficies (hundida, papel, elevada) sin subir el brillo general.
+ *
+ * La única excepción es el pie: cierra la página y ahí sí llega a la tinta
+ * plena, por eso lleva token propio.
+ */
 @mixin dark-tokens {
   color-scheme: dark;
 
-  --paper: #0b0c0e;
-  --surface: #131417;
-  --surface-sunken: #0f1013;
+  --paper: #1a1c21;
+  --surface: #23262c;
+  --surface-sunken: #16181d;
 
   --ink: #f4f5f6;
   --steel: #9ba0a8;
-  --steel-light: #71767e;
+  --steel-light: #868c95;
 
-  --line: #24262b;
-  --line-strong: #33363d;
+  --line: #30333a;
+  --line-strong: #3d414a;
 
   --accent: #ffffff;
   --accent-strong: #e6e7e9;
-  --accent-wash: #1c1e23;
+  --accent-wash: #2a2e36;
   --on-accent: #0a0a0b;
 
-  /* En oscuro el bloque invertido gana profundidad hundiéndose, no aclarándose:
-     dos bandas blancas en una página oscura cansan la vista. */
-  --invert-bg: #050607;
+  /* El pie sigue siendo tinta plena en los dos temas, así que estos no cambian
+     tanto como el resto de la paleta. */
   --invert-fg: #f4f5f6;
-  --invert-muted: #71767e;
-  --invert-line: #1b1d21;
+  --invert-muted: #9ba0a8;
+  --invert-line: #31353e;
   --invert-accent: #ffffff;
+
+  --footer-bg: #050607;
 
   --error: #f2857c;
   --success: #6ac49b;
 
-  --header-bg: rgb(11 12 14 / 82%);
-  --grid-line: #191b1f;
+  --header-bg: rgb(26 28 33 / 82%);
+  --grid-line: #262930;
   --dot: rgb(255 255 255 / 82%);
   --grid-dot: rgb(255 255 255 / 14%);
+  // Sobre gris, el blanco rinde más que el negro sobre claro: un par de puntos menos.
+  --watermark: rgb(255 255 255 / 9%);
   --shadow-color: 0 0 0;
 }
 
@@ -316,25 +333,6 @@ button {
   font-size: var(--text-lg);
   line-height: 1.6;
   color: var(--steel);
-}
-
-/* Secciones sobre fondo invertido: dan ritmo al one-page sin salir del monocromo */
-.section-invert {
-  background: var(--invert-bg);
-  color: var(--invert-fg);
-
-  .section-title {
-    color: var(--invert-fg);
-  }
-
-  .section-subtitle,
-  .eyebrow {
-    color: var(--invert-muted);
-  }
-
-  .eyebrow-slash {
-    color: var(--invert-accent);
-  }
 }
 
 .btn {

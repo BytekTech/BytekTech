@@ -9,9 +9,12 @@ const TRANSITION_CLASS = 'theme-transition';
 /** Debe cubrir la duración declarada en styles.scss, con margen para el repintado. */
 const TRANSITION_MS = 400;
 
+/** Tiene que ser el mismo valor que `--paper` en cada tema: es el color con el
+ *  que el navegador pinta su propia barra, y cualquier desfase se ve como una
+ *  franja de otro tono pegada al borde de la página. */
 const BACKGROUND_BY_THEME: Record<Theme, string> = {
   light: '#f7f7f8',
-  dark: '#0b0c0e',
+  dark: '#1a1c21',
 };
 
 /**
