@@ -36,10 +36,20 @@
   text-transform: uppercase;
   color: var(--steel-light);
 
-  // El punto separador se pinta como el resto de los signos de la casa; el aire
-  // a los costados ya lo pone el interletrado de la línea.
+  /*
+   * El punto separador no lleva color propio: hereda el del renglón, porque
+   * separa palabras y no las jerarquiza. El aire a los costados ya lo pone el
+   * interletrado de la línea.
+   *
+   * Y se sube hasta el centro óptico de las mayúsculas. Un punto se apoya en la
+   * línea de base, así que entre palabras en caja alta quedaba colgando del pie
+   * del renglón en vez de partirlo al medio. El desplazamiento es la mitad de
+   * la altura de mayúscula menos la mitad del punto; en `em` para que aguante
+   * cualquier cuerpo de letra.
+   */
   .dot {
-    color: var(--accent);
+    display: inline-block;
+    transform: translateY(-0.32em);
   }
 }
 

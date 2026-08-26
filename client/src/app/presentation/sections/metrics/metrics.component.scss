@@ -14,10 +14,12 @@
   border-top: 1px solid var(--line);
 }
 
+// Tres por fila: con seis cifras quedan dos filas parejas. En cuatro columnas
+// las dos últimas colgaban solas en una segunda fila a medio llenar.
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-6);
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-7) var(--space-6);
   margin: 0;
 }
 
