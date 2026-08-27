@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Meta } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 import { Lang, SUPPORTED_LANGS } from '../../../domain/models/language.model';
@@ -23,6 +24,7 @@ type Draft = Record<ContentSection, EditableItem[]>;
 
 @Component({
   selector: 'app-admin',
+  imports: [RouterLink],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +37,8 @@ export class AdminComponent {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly langs = SUPPORTED_LANGS;
+  /** El botón muestra el código; el nombre completo queda para el lector de pantalla. */
+  readonly langNames: Record<Lang, string> = { es: 'Español', en: 'Inglés' };
   readonly specs = SECTION_SPECS;
 
   readonly isAuthenticated = signal(false);
@@ -159,6 +163,9 @@ export class AdminComponent {
         this.editor.save(section, items as unknown as SiteContent[typeof section]),
       );
       this.editSection(() => saved as unknown as EditableItem[]);
+      // El sitio y el panel son la misma aplicación: sin avisarle al repositorio,
+      // volver al sitio sin recargar seguía mostrando lo de antes de publicar.
+      this.content.refresh();
       this.saveState.set('saved');
     } catch (error) {
       this.saveState.set('failed');

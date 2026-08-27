@@ -17,6 +17,12 @@ import { ContentServiceRepository } from '../data/content/content-service.reposi
 import { ContentMetricRepository } from '../data/content/content-metric.repository';
 import { ContentProcessStepRepository } from '../data/content/content-process-step.repository';
 import { ContentFaqRepository } from '../data/content/content-faq.repository';
+import { LegalRepository } from '../domain/repositories/legal.repository';
+import { StaticLegalRepository } from '../data/legal/static-legal.repository';
+import { AdminSessionGateway } from '../domain/gateways/admin-session.gateway';
+import { ContentEditorGateway } from '../domain/gateways/content-editor.gateway';
+import { HttpAdminSessionGateway } from '../data/admin/http-admin-session.gateway';
+import { HttpContentEditorGateway } from '../data/admin/http-content-editor.gateway';
 
 /**
  * Las mismas implementaciones que usa la composition root, para que los tests
@@ -33,4 +39,7 @@ export const contentProviders: Provider[] = [
   { provide: ProcessStepRepository, useClass: ContentProcessStepRepository },
   { provide: FaqRepository, useClass: ContentFaqRepository },
   { provide: ContactGateway, useClass: HttpContactGateway },
+  { provide: LegalRepository, useClass: StaticLegalRepository },
+  { provide: AdminSessionGateway, useClass: HttpAdminSessionGateway },
+  { provide: ContentEditorGateway, useClass: HttpContentEditorGateway },
 ];

@@ -10,6 +10,8 @@ export interface Company {
   siteUrl: string;
   legalName: string;
   email: string;
+  /** Teléfono tal como se lee, con espacios y guiones. */
+  phone: string;
   location: string;
   foundedYear: number;
   social: SocialLink[];

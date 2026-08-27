@@ -1,8 +1,8 @@
 /*
  * Cimiento de la página: el pie se apoya siempre en el borde inferior de la
- * ventana. En las vistas cortas —el panel antes de entrar, los términos en una
- * pantalla grande, un error— el contenido no llega a llenar el alto, y sin
- * esto el pie quedaba flotando a media pantalla con papel en blanco debajo.
+ * ventana. En las vistas cortas —los términos en una pantalla grande, un
+ * error— el contenido no llega a llenar el alto, y sin esto el pie quedaba
+ * flotando a media pantalla con papel en blanco debajo.
  */
 :host {
   display: flex;

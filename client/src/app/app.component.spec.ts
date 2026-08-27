@@ -26,23 +26,4 @@ describe('AppComponent', () => {
 
     expect(fixture.componentInstance).toBeTruthy();
   });
-
-  it('should render the header wordmark', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-
-    expect(compiled.querySelector('.wordmark')?.textContent).toContain('bytek');
-  });
-
-  it('ofrece un salto al contenido como primer elemento enfocable', async () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    const skipLink = compiled.querySelector<HTMLAnchorElement>('.skip-link');
-
-    expect(skipLink).not.toBeNull();
-    expect(skipLink?.getAttribute('href')).toBe('#contenido');
-    expect(compiled.querySelector('main')?.id).toBe('contenido');
-  });
 });

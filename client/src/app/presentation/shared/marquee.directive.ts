@@ -68,6 +68,14 @@ function keepOutOfTabOrder(element: HTMLElement): void {
     '(pointermove)': 'continueDrag($event)',
     '(pointerup)': 'endDrag($event)',
     '(pointercancel)': 'endDrag($event)',
+    // Red de seguridad del arrastre táctil: cuando el navegador se queda con el
+    // gesto para desplazar la página, a veces se lleva la captura sin avisar por
+    // `pointercancel`. Sin esto la cinta quedaba tomada —y por lo tanto quieta—
+    // para el resto de la visita.
+    '(lostpointercapture)': 'endDrag($event)',
+    // Los nombres son enlaces, y arrastrar un enlace dispara el arrastre propio
+    // del navegador: se lleva el puntero y la cinta deja de seguir al mouse.
+    '(dragstart)': 'preventNativeDrag($event)',
     '(click)': 'swallowClickAfterDrag($event)',
     '(focusin)': 'onFocusIn($event)',
     '(focusout)': 'focused.set(false)',
@@ -244,6 +252,10 @@ export class MarqueeDirective {
       return;
     }
     this.resumeTimer = setTimeout(() => this.grabbed.set(false), RESUME_DELAY_MS);
+  }
+
+  protected preventNativeDrag(event: DragEvent): void {
+    event.preventDefault();
   }
 
   protected swallowClickAfterDrag(event: MouseEvent): void {

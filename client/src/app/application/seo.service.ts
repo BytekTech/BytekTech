@@ -100,6 +100,7 @@ export class SeoService {
           legalName: this.company.legalName,
           url: this.company.siteUrl,
           email: this.company.email,
+          telephone: this.company.phone,
           logo: `${this.company.siteUrl}/apple-touch-icon.png`,
           foundingDate: String(this.company.foundedYear),
           sameAs: this.company.social.map((link) => link.url),

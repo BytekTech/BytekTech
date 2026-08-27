@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { COMPANY_INFO } from '../../../application/company.token';
+import { telHref } from '../../shared/tel-href';
 import { LanguageService } from '../../../application/language.service';
 import { pathFor } from '../../../application/i18n/site-pages';
 import { NAV_SECTIONS } from '../nav-sections';
@@ -15,6 +16,7 @@ export class FooterComponent {
 
   readonly t = this.language.t;
   readonly company = inject(COMPANY_INFO);
+  readonly telHref = telHref;
   readonly currentYear = new Date().getFullYear();
 
   // El footer enlaza las secciones, no el contacto: ese ya es el bloque de arriba.

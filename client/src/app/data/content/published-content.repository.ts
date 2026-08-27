@@ -1,6 +1,6 @@
 import { inject, Injectable, makeStateKey, REQUEST_CONTEXT, TransferState } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, shareReplay } from 'rxjs';
+import { BehaviorSubject, Observable, of, shareReplay, switchMap } from 'rxjs';
 import { SiteContent } from '../../domain/models/site-content.model';
 import { ContentRepository } from '../../domain/repositories/content.repository';
 
@@ -27,10 +27,23 @@ export class PublishedContentRepository extends ContentRepository {
   private readonly renderContext = inject(REQUEST_CONTEXT, { optional: true }) as RenderContext | null;
   private readonly http = inject(HttpClient);
 
-  private readonly content$ = this.resolve().pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  /** Cuántas veces se pidió volver a la fuente. La primera vuelta es la carga. */
+  private readonly rounds = new BehaviorSubject(0);
+
+  private readonly content$ = this.rounds.pipe(
+    // Lo transferido sirve para la primera pintura y nada más: después de
+    // publicar es justamente el contenido que quedó viejo.
+    switchMap((round) => (round === 0 ? this.resolve() : this.fetch())),
+    shareReplay({ bufferSize: 1, refCount: false }),
+  );
 
   getContent(): Observable<SiteContent> {
     return this.content$;
+  }
+
+  override refresh(): void {
+    this.transferState.remove(CONTENT_KEY);
+    this.rounds.next(this.rounds.value + 1);
   }
 
   private resolve(): Observable<SiteContent> {
@@ -45,6 +58,10 @@ export class PublishedContentRepository extends ContentRepository {
       return of(fromServer);
     }
 
+    return this.fetch();
+  }
+
+  private fetch(): Observable<SiteContent> {
     return this.http.get<SiteContent>('/api/content');
   }
 }

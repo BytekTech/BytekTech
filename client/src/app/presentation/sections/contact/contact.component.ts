@@ -3,6 +3,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { ContactGateway } from '../../../domain/gateways/contact.gateway';
 import { LanguageService } from '../../../application/language.service';
 import { COMPANY_INFO } from '../../../application/company.token';
+import { telHref } from '../../shared/tel-href';
 
 type SubmitStatus = 'idle' | 'sending' | 'success' | 'error';
 type TextControl = 'name' | 'email' | 'message';
@@ -21,6 +22,7 @@ export class ContactComponent {
 
   readonly t = this.language.t;
   readonly company = inject(COMPANY_INFO);
+  readonly telHref = telHref;
   readonly status = signal<SubmitStatus>('idle');
 
   readonly form = this.formBuilder.group({

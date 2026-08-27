@@ -14,7 +14,8 @@
           <span aria-hidden="true">//</span>
           {{ t().contact.directLabel }}
         </p>
-        <a class="direct-email" [href]="'mailto:' + company.email">{{ company.email }}</a>
+        <a class="direct-link" [href]="'mailto:' + company.email">{{ company.email }}</a>
+        <a class="direct-link" [href]="telHref(company.phone)">{{ company.phone }}</a>
         <span class="direct-location">{{ company.location }}</span>
       </div>
     </div>

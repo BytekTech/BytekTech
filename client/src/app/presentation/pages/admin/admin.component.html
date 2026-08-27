@@ -1,6 +1,14 @@
 <section class="admin">
+  <a class="back" routerLink="/">
+    <span class="back-arrow" aria-hidden="true">←</span>
+    Volver al sitio
+  </a>
+
   <header class="head">
-    <h1 class="wordmark">bytek<span class="bit" aria-hidden="true"></span> <span class="panel-name">panel</span></h1>
+    <h1 class="wordmark">
+      bytek technology<span class="bit" aria-hidden="true"></span>
+      <span class="panel-name">panel</span>
+    </h1>
     @if (isAuthenticated()) {
       <button type="button" class="ghost" (click)="logout()">Cerrar sesión</button>
     }
@@ -33,15 +41,19 @@
 
     <div class="toolbar">
       <div class="lang" role="group" aria-label="Idioma que se está editando">
-        @for (option of langs; track option) {
+        @for (option of langs; track option; let last = $last) {
           <button
             type="button"
             [class.active]="activeLang() === option"
             [attr.aria-pressed]="activeLang() === option"
+            [attr.aria-label]="langNames[option]"
             (click)="activeLang.set(option)"
           >
-            {{ option === 'es' ? 'Español' : 'Inglés' }}
+            {{ option.toUpperCase() }}
           </button>
+          @if (!last) {
+            <span class="lang-divider" aria-hidden="true">/</span>
+          }
         }
       </div>
 

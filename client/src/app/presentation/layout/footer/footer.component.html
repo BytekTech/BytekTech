@@ -16,6 +16,7 @@
       <div class="links">
         <p class="links-label">{{ t().footer.contactLabel }}</p>
         <a [href]="'mailto:' + company.email">{{ company.email }}</a>
+        <a [href]="telHref(company.phone)">{{ company.phone }}</a>
         <span class="location">{{ company.location }}</span>
       </div>
 

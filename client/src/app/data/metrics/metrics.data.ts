@@ -4,13 +4,12 @@ import { Metric } from '../../domain/models/metric.model';
 // [COMPLETAR] Cifras provisorias. Son afirmaciones públicas sobre la empresa:
 // reemplazar por números reales y verificables antes de publicar el sitio.
 //
-// Las cuatro últimas ('on-time', 'budget', 'retention', 'incident') hablan de
-// lo que le pasa al cliente —recibe en fecha, al precio pactado, se queda y lo
-// atienden cuando algo se rompe— en vez de describirnos a nosotros. Confirmar
-// cada valor o cambiar la métrica antes de publicar.
+// Las tres últimas ('on-time', 'budget', 'incident') hablan de lo que le pasa
+// al cliente —recibe en fecha, al precio pactado y lo atienden cuando algo se
+// rompe— en vez de describirnos a nosotros. Confirmar cada valor o cambiar la
+// métrica antes de publicar.
 //
-// Van de a tres por fila: seis entran en dos filas parejas, y la grilla las
-// reparte de nuevo en pantallas chicas.
+// Van de a tres por fila, y la grilla las reparte de nuevo en pantallas chicas.
 // ─────────────────────────────────────────────────────────────────────────────
 export const METRICS: Metric[] = [
   {
@@ -58,21 +57,6 @@ export const METRICS: Metric[] = [
       en: {
         label: 'Deviation from the quoted budget',
         detail: 'what is signed up front is what gets paid at the end',
-      },
-    },
-  },
-  {
-    id: 'retention',
-    value: 9,
-    suffix: '/10',
-    copy: {
-      es: {
-        label: 'Clientes que siguen con nosotros',
-        detail: 'después del primer proyecto entregado',
-      },
-      en: {
-        label: 'Clients that stay with us',
-        detail: 'after the first project ships',
       },
     },
   },

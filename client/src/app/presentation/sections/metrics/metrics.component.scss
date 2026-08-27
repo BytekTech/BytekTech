@@ -14,17 +14,22 @@
   border-top: 1px solid var(--line);
 }
 
-// Tres por fila: con seis cifras quedan dos filas parejas. En cuatro columnas
-// las dos últimas colgaban solas en una segunda fila a medio llenar.
+// Tres por fila, repartidas con flex y no con grid: cuando la cantidad de
+// cifras no llena la última fila, ésta queda centrada en vez de colgar contra
+// el margen izquierdo. Cada cifra mide lo mismo que en una grilla de tres
+// —de ahí el ancho con los huecos descontados—, pero la fila corta queda
+// corrida respecto de las de arriba: es el precio de centrarla.
 .grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-7) var(--space-6);
   margin: 0;
 }
 
 .metric {
   display: flex;
+  flex: 0 1 calc((100% - 2 * var(--space-6)) / 3);
   flex-direction: column;
   padding-top: var(--space-5);
   border-top: 1px solid var(--line-strong);
@@ -66,14 +71,20 @@
 
 @include bp.below(lg) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-5);
+  }
+
+  .metric {
+    flex-basis: calc((100% - var(--space-5)) / 2);
   }
 }
 
 @include bp.below(xs) {
   .grid {
-    grid-template-columns: 1fr;
     gap: var(--space-6);
+  }
+
+  .metric {
+    flex-basis: 100%;
   }
 }

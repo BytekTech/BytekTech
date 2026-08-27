@@ -1,4 +1,5 @@
 @use 'breakpoints' as bp;
+@use 'lang-toggle' as lang;
 
 :host {
   position: sticky;
@@ -61,40 +62,7 @@
 }
 
 .lang {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-
-  button {
-    display: inline-flex;
-    align-items: center;
-    // El mismo alto que el resto de los botones de la barra: con el dedo, un
-    // texto de dos letras necesita blanco propio para poder tocarse.
-    min-height: 2.25rem;
-    padding: 0.25rem var(--space-2);
-    border: 0;
-    background: none;
-    color: var(--steel);
-    cursor: pointer;
-    letter-spacing: 0.08em;
-    transition: color var(--duration-fast) var(--ease);
-
-    &:hover {
-      color: var(--ink);
-    }
-
-    &.active {
-      color: var(--accent);
-      font-weight: 600;
-    }
-  }
-
-  .lang-divider {
-    color: var(--line-strong);
-    user-select: none;
-  }
+  @include lang.lang-toggle;
 }
 
 .theme-toggle {
