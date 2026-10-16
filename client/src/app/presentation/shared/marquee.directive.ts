@@ -29,6 +29,17 @@ const RESUME_DELAY_MS = 900;
 /** Aire entre el elemento que recibe el foco y el borde de la ventana. */
 const FOCUS_MARGIN_PX = 24;
 
+/**
+ * Qué se mira de cada marca del listado: lo que puede cambiarle el dibujo.
+ * Texto —el idioma, sin ir más lejos— y atributos, que es por donde entran el
+ * color de marca y el patrón de bits.
+ */
+const MARK_CHANGES: MutationObserverInit = {
+  subtree: true,
+  characterData: true,
+  attributes: true,
+};
+
 /** Saca del tabulador todo lo que se pueda enfocar dentro de un elemento. */
 function keepOutOfTabOrder(element: HTMLElement): void {
   element
@@ -107,12 +118,14 @@ export class MarqueeDirective {
   /** Ancho de una copia del listado, incluido el espacio que la separa de la siguiente. */
   private span = 0;
   private clones: HTMLElement[] = [];
+  private contentWatcher: MutationObserver | undefined;
   private drag: { pointerId: number; startX: number; startOffset: number } | null = null;
   private dragged = false;
   private resumeTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
     afterNextRender(() => {
+      this.watchContent();
       this.rebuild();
       this.watchWidth();
       this.watchVisibility();
@@ -142,18 +155,28 @@ export class MarqueeDirective {
   }
 
   /**
-   * Rehace las copias y vuelve a medir el bucle. Se parte siempre del listado
-   * original —el que maneja Angular— para que un cambio de ancho o de datos no
-   * arrastre clones viejos.
+   * Rehace las copias y vuelve a mirar el listado. Las copias que escribe esta
+   * directiva no son un cambio del listado, así que deja de mirarlo mientras
+   * las toca: observarse a sí misma sería un bucle sin fin.
    */
   private rebuild(): void {
+    this.contentWatcher?.disconnect();
+    this.watchMarks(this.rebuildCopies());
+  }
+
+  /**
+   * Rehace las copias y vuelve a medir el bucle. Se parte siempre del listado
+   * original —el que maneja Angular— para que un cambio de ancho o de datos no
+   * arrastre clones viejos, y se devuelve ese listado para volver a mirarlo.
+   */
+  private rebuildCopies(): HTMLElement[] {
     const track = this.host.nativeElement;
     this.clones.forEach((clone) => clone.remove());
     this.clones = [];
 
     const originals = Array.from(track.children) as HTMLElement[];
     if (originals.length === 0) {
-      return;
+      return originals;
     }
 
     // Una cinta que el template declara decorativa tampoco aporta paradas al
@@ -169,11 +192,43 @@ export class MarqueeDirective {
     this.span = firstClone.offsetLeft - originals[0].offsetLeft;
 
     const viewportWidth = track.parentElement?.clientWidth ?? 0;
-    for (let copy = 2; copy < copiesNeeded(viewportWidth, this.span); copy++) {
+    const copies = copiesNeeded(viewportWidth, this.span, originals.length);
+    for (let copy = 2; copy < copies; copy++) {
       this.appendCopy(originals);
     }
 
     this.shiftTo(this.offset);
+    return originals;
+  }
+
+  /**
+   * Las copias son un espejo del listado: valen mientras el original no cambie.
+   * Cambia más de lo que parece —el contenido publicado puede llegar después de
+   * la primera pintura, el panel lo republica en caliente y el conmutador de
+   * idioma reescribe cada ficha—, y sin volver a espejarlo la cinta se queda
+   * quieta o mezcla marcas viejas con nuevas. Se mira el DOM y no un listado
+   * recibido por input para que la cinta siga sin saber de dónde salen las
+   * marcas.
+   */
+  private watchContent(): void {
+    this.contentWatcher = new MutationObserver(() => this.rebuild());
+    this.destroyRef.onDestroy(() => this.contentWatcher?.disconnect());
+  }
+
+  /**
+   * Vuelve a mirar el listado, marca por marca y no la cinta entera: sobre la
+   * cinta esta directiva escribe el `transform` en cada cuadro y la clase del
+   * arrastre, y eso llenaría la cola de cambios que no son cambios. De la cinta
+   * sólo interesan las altas y bajas, que es lo único que le hace Angular.
+   */
+  private watchMarks(originals: HTMLElement[]): void {
+    const watcher = this.contentWatcher;
+    if (!watcher) {
+      return;
+    }
+
+    watcher.observe(this.host.nativeElement, { childList: true });
+    originals.forEach((original) => watcher.observe(original, MARK_CHANGES));
   }
 
   private appendCopy(originals: HTMLElement[]): void {

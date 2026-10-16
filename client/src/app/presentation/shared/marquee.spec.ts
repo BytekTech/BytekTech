@@ -2,8 +2,8 @@ import {
   copiesNeeded,
   directionSign,
   frameDistance,
-  MAX_COPIES,
   MAX_FRAME_MS,
+  MAX_MARKS,
   wrapOffset,
 } from './marquee';
 
@@ -51,18 +51,38 @@ describe('directionSign', () => {
 
 describe('copiesNeeded', () => {
   it('usa dos copias cuando una ya tapa la ventana', () => {
-    expect(copiesNeeded(800, 900)).toBe(2);
+    expect(copiesNeeded(800, 900, 6)).toBe(2);
   });
 
   it('agrega copias cuando el listado es más corto que la ventana', () => {
-    expect(copiesNeeded(1600, 400)).toBe(5);
+    expect(copiesNeeded(1600, 400, 3)).toBe(5);
   });
 
-  it('se planta en un tope de copias', () => {
-    expect(copiesNeeded(100000, 10)).toBe(MAX_COPIES);
+  // El caso que dejaba el hueco a la vista: una sola marca en un monitor ancho
+  // necesita más repeticiones que las que permitía el viejo tope de copias.
+  it('tapa una pantalla ancha con un listado de una sola marca', () => {
+    const copyWidth = 136;
+    const viewportWidth = 3440;
+    const copies = copiesNeeded(viewportWidth, copyWidth, 1);
+
+    // Corrida una copia entera, lo que queda todavía tiene que tapar la ventana.
+    expect((copies - 1) * copyWidth).toBeGreaterThanOrEqual(viewportWidth);
+  });
+
+  it('se planta en un tope de marcas, no de copias', () => {
+    expect(copiesNeeded(100000, 10, 1)).toBe(MAX_MARKS);
+    expect(copiesNeeded(100000, 10, 4)).toBe(MAX_MARKS / 4);
+  });
+
+  it('conserva las dos copias del bucle aunque el listado pase el tope', () => {
+    expect(copiesNeeded(1600, 4000, MAX_MARKS * 2)).toBe(2);
   });
 
   it('no clona nada sin medida del listado', () => {
-    expect(copiesNeeded(1600, 0)).toBe(1);
+    expect(copiesNeeded(1600, 0, 3)).toBe(1);
+  });
+
+  it('no clona nada con el listado vacío', () => {
+    expect(copiesNeeded(1600, 400, 0)).toBe(1);
   });
 });

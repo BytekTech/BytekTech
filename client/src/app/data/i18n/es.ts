@@ -48,6 +48,7 @@ export const ES: Translations = {
     subtitle:
       'Empresas que nos confiaron el software del que depende su operación, y que siguen con nosotros.',
     carouselLabel: 'Clientes de Bytek, en movimiento continuo',
+    since: 'desde',
   },
   process: {
     eyebrow: 'proceso',

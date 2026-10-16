@@ -56,6 +56,8 @@ export interface Translations {
     subtitle: string;
     /** Etiqueta accesible de la cinta de clientes: sin ella es una lista sin nombre. */
     carouselLabel: string;
+    /** Antecede al año en que empezó la relación: "desde 2023". */
+    since: string;
   };
   process: {
     eyebrow: string;

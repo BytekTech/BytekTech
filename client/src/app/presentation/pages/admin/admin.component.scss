@@ -1,4 +1,15 @@
+@use 'breakpoints' as bp;
+@use 'controls' as ctl;
 @use 'lang-toggle' as lang;
+
+/*
+ * Cáscara del panel: lo que rodea al contenido editable —entrada, cabecera,
+ * pestañas, barra de herramientas y avisos—.
+ *
+ * La lista de entradas vive en `admin-rows.scss` y los campos de cada una en
+ * `admin-fields.scss`. Son tres cosas que se tocan por motivos distintos y en
+ * un archivo solo se leían como quinientas líneas sin junta.
+ */
 
 // El panel usa la misma paleta y las mismas medidas que el sitio: es la
 // trastienda de la misma casa, no otra aplicación.
@@ -71,21 +82,18 @@
   margin: var(--space-6) 0 var(--space-5);
 }
 
+// La pestaña es el mismo botón de contorno con menos holgura y en voz más baja:
+// hay cinco en fila y no tienen que pesar como una acción.
 .tabs button {
+  @include ctl.pressable;
+  @include ctl.outlined;
+
   padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: transparent;
   color: var(--steel);
-  cursor: pointer;
-  transition:
-    color var(--duration-base) var(--ease),
-    border-color var(--duration-base) var(--ease),
-    background-color var(--duration-base) var(--ease);
 
   &:hover {
-    color: var(--ink);
     border-color: var(--ink);
+    color: var(--ink);
   }
 
   &.active {
@@ -110,19 +118,15 @@
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-3);
 }
 
 button.primary,
 button.ghost,
 button.danger {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition:
-    background-color var(--duration-base) var(--ease),
-    border-color var(--duration-base) var(--ease),
-    color var(--duration-base) var(--ease);
+  @include ctl.pressable;
+  @include ctl.button-room;
 }
 
 button.primary {
@@ -137,9 +141,7 @@ button.primary {
 }
 
 button.ghost {
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--ink);
+  @include ctl.outlined;
 
   &:hover {
     border-color: var(--ink);
@@ -147,200 +149,14 @@ button.ghost {
 }
 
 button.danger {
-  border: 1px solid var(--line);
-  background: transparent;
+  @include ctl.outlined;
+
   color: var(--steel);
 
   &:hover {
     border-color: currentcolor;
-    color: #c92a2a;
+    color: var(--error);
   }
-}
-
-// Las entradas se agrupan en un plano hundido y cada una se apoya encima como
-// una ficha propia: así se ve dónde empieza y termina cada una —sobre todo con
-// una abierta—, en vez de leerse como un listado continuo separado por rayas.
-.rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: 0;
-  padding: var(--space-3);
-  list-style: none;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-  background: var(--surface-sunken);
-}
-
-.row {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  transition: border-color var(--duration-base) var(--ease);
-
-  &:hover,
-  &[open] {
-    border-color: var(--line-strong);
-  }
-}
-
-// Mismo despliegue animado que las preguntas del sitio: el panel no estrena
-// otro lenguaje de interacción.
-.row-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  cursor: pointer;
-  list-style: none;
-
-  &::-webkit-details-marker {
-    display: none;
-  }
-
-  &:hover .row-title {
-    color: var(--accent);
-  }
-}
-
-.row-title {
-  font-weight: 500;
-  color: var(--ink);
-  transition: color var(--duration-base) var(--ease);
-}
-
-.marker {
-  position: relative;
-  flex: none;
-  width: 0.85rem;
-  height: 0.85rem;
-  transition: transform var(--duration-base) var(--ease);
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 50% 0 auto;
-    height: 1.5px;
-    background: var(--accent);
-  }
-
-  &::after {
-    transform: rotate(90deg);
-    transition: opacity var(--duration-base) var(--ease);
-  }
-}
-
-.row[open] .marker {
-  transform: rotate(180deg);
-
-  &::after {
-    opacity: 0;
-  }
-}
-
-.row::details-content {
-  block-size: 0;
-  overflow: hidden;
-  transition:
-    block-size var(--duration-base) var(--ease),
-    content-visibility var(--duration-base) var(--ease) allow-discrete;
-}
-
-.row[open]::details-content {
-  block-size: auto;
-}
-
-.row-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
-  gap: var(--space-4);
-  padding: 0 var(--space-4) var(--space-5);
-}
-
-.field {
-  display: grid;
-  gap: var(--space-2);
-  margin: 0;
-
-  &.wide {
-    grid-column: 1 / -1;
-  }
-
-  label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-family: var(--font-mono);
-    font-size: var(--text-xs);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--steel);
-  }
-}
-
-.tag {
-  padding: 0 0.35em;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  color: var(--ink);
-}
-
-.hint {
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--steel-light);
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: var(--space-3);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  transition: border-color var(--duration-base) var(--ease);
-
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 1px;
-  }
-}
-
-textarea {
-  resize: vertical;
-}
-
-.color-field {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-
-  input[type='color'] {
-    width: 3rem;
-    height: 2.2rem;
-    padding: 2px;
-  }
-}
-
-.color-value {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--steel);
-}
-
-.row-actions {
-  display: flex;
-  grid-column: 1 / -1;
-  gap: var(--space-3);
-}
-
-.rows .notice {
-  margin: 0;
-  padding: var(--space-4);
 }
 
 .notice,
@@ -355,5 +171,17 @@ textarea {
 }
 
 .error {
-  color: #c92a2a;
+  color: var(--error);
+}
+
+// Gana sobre `.active` por orden de aparición: si al idioma le falta algo, eso
+// es lo que hay que ver, esté o no seleccionado.
+.lang button.blocked {
+  color: var(--error);
+}
+
+@include bp.below(sm) {
+  .admin {
+    padding: var(--space-6) var(--space-4) var(--space-8);
+  }
 }

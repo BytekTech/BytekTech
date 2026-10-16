@@ -1,0 +1,187 @@
+@use 'breakpoints' as bp;
+@use 'controls' as ctl;
+
+/*
+ * Los campos de una entrada abierta: etiquetas, controles de texto y número,
+ * el selector de color, la subida del icono y los avisos de lo que falta.
+ */
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+
+  // Los campos que necesitan el ancho de la fila: los textos largos, las listas
+  // y el icono, que tiene que mostrar la vista previa al lado del botón.
+  &.wide {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--steel);
+  }
+}
+
+.tag {
+  padding: 0 0.35em;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+}
+
+.hint {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--steel-light);
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  transition: border-color var(--duration-base) var(--ease);
+
+  &:focus-visible {
+    @include ctl.focus-ring;
+  }
+
+  // El servidor rechaza sin decir qué campo le falta: el panel marca lo que él
+  // mismo sabe que lo va a hacer rechazar. El borde acompaña al aviso de la
+  // fila y al del idioma; solo, el color no alcanzaría.
+  &.invalid {
+    border-color: var(--error);
+  }
+}
+
+textarea {
+  resize: vertical;
+}
+
+// El borde rojo avisa que algo está mal; esto dice qué. Va pegado al campo
+// porque el mensaje de arriba habla de la sección entera y no alcanza para
+// encontrar cuál de todos es.
+.field-issue {
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--error);
+}
+
+.color-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  input[type='color'] {
+    width: 3rem;
+    height: 2.2rem;
+    padding: 2px;
+  }
+}
+
+.color-value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--steel);
+}
+
+// Subida del icono: vista previa, selector y la forma de sacarlo, en una línea
+// que se parte sola cuando no entra.
+.icon-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+
+  button {
+    flex: none;
+  }
+}
+
+// El control de archivo nativo desentona con todo lo demás, así que se le da el
+// aspecto de la casa. Se estiliza el botón propio del elemento en vez de
+// esconderlo tras una etiqueta disfrazada: el control sigue siendo el de
+// siempre, con su foco, su teclado y su etiqueta, y no hay que sostener un
+// remedo accesible que tarde o temprano se despega del original.
+.icon-field input[type='file'] {
+  flex: none;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  // El "sin archivos seleccionados" no aporta: el valor se limpia en cada
+  // elección y lo que confirma la subida es la vista previa de al lado.
+  color: transparent;
+
+  &::file-selector-button {
+    @include ctl.pressable;
+    @include ctl.outlined;
+    @include ctl.button-room;
+
+    margin-right: 0;
+  }
+
+  &:hover::file-selector-button {
+    border-color: var(--ink);
+  }
+
+  // El foco llega al input, no al pseudo-elemento: el anillo va sobre el botón,
+  // que es lo único que se ve del control.
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::file-selector-button {
+    @include ctl.focus-ring;
+  }
+}
+
+// Fondo a cuadros: casi todos los logos vienen con transparencia, y sobre una
+// superficie lisa no se distingue el blanco propio del logo del de la caja.
+.icon-preview {
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+  background-image:
+    linear-gradient(45deg, var(--surface-sunken) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--surface-sunken) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--surface-sunken) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--surface-sunken) 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+
+@include bp.below(sm) {
+  // En pantalla angosta cada pieza en su renglón: en fila, el botón de subida
+  // quedaba reducido a un par de caracteres y el de quitar no entraba.
+  .icon-field {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .icon-field input[type='file'],
+  .icon-field input[type='file']::file-selector-button,
+  .icon-field button {
+    width: 100%;
+  }
+
+  // La vista previa no se estira con el resto: sigue siendo un cuadro.
+  .icon-preview {
+    align-self: flex-start;
+  }
+}

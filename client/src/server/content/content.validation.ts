@@ -5,6 +5,17 @@ import { ProcessStep } from '../../app/domain/models/process-step.model';
 import { Service } from '../../app/domain/models/service.model';
 import { Lang, SUPPORTED_LANGS } from '../../app/domain/models/language.model';
 import { ContentSection, SiteContent } from '../../app/domain/models/site-content.model';
+import { ICON_MAX_DATA_URI_LENGTH, iconIssue } from '../../app/domain/models/client-icon';
+import {
+  BITS_PATTERN,
+  COLOR_PATTERN,
+  ID_PATTERN,
+  METRIC_VALUE_RANGE,
+  ORDER_RANGE,
+  Range,
+  SINCE_RANGE,
+  withinRange,
+} from '../../app/domain/models/content-rules';
 
 /**
  * Validación del contenido que llega del panel. Todo lo que entra por la red es
@@ -24,15 +35,6 @@ const LIMITS = {
   long: 2000,
   url: 400,
 } as const;
-
-/**
- * Un color de marca termina escrito en una custom property de CSS: se aceptan
- * literales de color inertes y nada más, nunca una expresión capaz de arrastrar
- * otra declaración detrás.
- */
-const COLOR_PATTERN = /^(#[0-9a-f]{3,8}|[a-z]{3,20})$/i;
-const ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,59}$/;
-const BITS_PATTERN = /^[01]{4,16}$/;
 
 function text(value: unknown, max: number): string | null {
   if (typeof value !== 'string') {
@@ -68,8 +70,8 @@ function link(value: unknown): string | null | undefined {
   }
 }
 
-function integer(value: unknown, min: number, max: number): number | null {
-  return typeof value === 'number' && Number.isInteger(value) && value >= min && value <= max
+function integer(value: unknown, range: Range): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && withinRange(value, range)
     ? value
     : null;
 }
@@ -125,7 +127,7 @@ function service(raw: Record<string, unknown>): Service | null {
 
 function metric(raw: Record<string, unknown>): Metric | null {
   const id = identifier(raw['id']);
-  const value = integer(raw['value'], 0, 1000000);
+  const value = integer(raw['value'], METRIC_VALUE_RANGE);
   const prefix = optionalText(raw['prefix'], 4);
   const suffix = optionalText(raw['suffix'], 8);
   const parsedCopy = copy(raw['copy'], (entry) => {
@@ -143,7 +145,7 @@ function metric(raw: Record<string, unknown>): Metric | null {
 function client(raw: Record<string, unknown>): Client | null {
   const id = identifier(raw['id']);
   const name = text(raw['name'], LIMITS.short);
-  const since = integer(raw['since'], 1980, 2100);
+  const since = integer(raw['since'], SINCE_RANGE);
   const website = link(raw['website']);
   const brandColor = optionalText(raw['brandColor'], 32);
   const parsedCopy = copy(raw['copy'], (entry) => {
@@ -158,12 +160,32 @@ function client(raw: Record<string, unknown>): Client | null {
   if (brandColor === null || (brandColor !== undefined && !COLOR_PATTERN.test(brandColor))) {
     return null;
   }
-  return { id, name, since, website, brandColor, copy: parsedCopy };
+
+  // El icono se revisa de verdad —formato, peso y medida leída de la propia
+  // cabecera del archivo—, no por lo que diga quien lo manda. Las mismas reglas
+  // que avisan en el panel, aplicadas acá, que es donde mandan.
+  const icon = optionalIcon(raw['icon']);
+  if (icon === null) {
+    return null;
+  }
+
+  return { id, name, since, website, brandColor, icon, copy: parsedCopy };
+}
+
+/** Un icono vacío es un cliente sin logotipo, no un error. */
+function optionalIcon(value: unknown): string | null | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+  if (typeof value !== 'string' || value.length > ICON_MAX_DATA_URI_LENGTH) {
+    return null;
+  }
+  return iconIssue(value) === null ? value : null;
 }
 
 function step(raw: Record<string, unknown>): ProcessStep | null {
   const id = identifier(raw['id']);
-  const order = integer(raw['order'], 1, 99);
+  const order = integer(raw['order'], ORDER_RANGE);
   const parsedCopy = copy(raw['copy'], (entry) => {
     const name = text(entry['name'], LIMITS.short);
     const description = text(entry['description'], LIMITS.long);

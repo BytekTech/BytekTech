@@ -1,0 +1,43 @@
+/*
+ * Forma de los controles del panel.
+ *
+ * El mismo botón aparece en tres lugares que no pueden compartir una regla: los
+ * botones propios, las pestañas de sección y el botón que el navegador le pone
+ * al control de archivo. Ese último es un pseudo-elemento, y agruparlo con los
+ * demás sería un riesgo real: un navegador que no conozca `::file-selector-button`
+ * descarta la lista de selectores entera y se lleva puestos también a los otros.
+ *
+ * De ahí que la forma se comparta por mixin y no por selector agrupado. No
+ * ahorra bytes —el mixin se expande en cada uso—, pero evita que tres copias
+ * del mismo botón se vayan separando con el tiempo, que es lo que ya había
+ * empezado a pasar.
+ */
+
+/** Lo que hace que algo se vea pulsable: forma, cursor y el mismo tiempo que el resto. */
+@mixin pressable {
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background-color var(--duration-base) var(--ease),
+    border-color var(--duration-base) var(--ease),
+    color var(--duration-base) var(--ease);
+}
+
+/** Piel del botón de contorno: todo lo que no es la acción principal. */
+@mixin outlined {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+/** Holgura de un botón del panel. */
+@mixin button-room {
+  padding: var(--space-2) var(--space-5);
+}
+
+/** El anillo de foco de la casa, uno solo para todos los controles. */
+@mixin focus-ring {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

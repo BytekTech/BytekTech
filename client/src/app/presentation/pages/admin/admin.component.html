@@ -45,8 +45,9 @@
           <button
             type="button"
             [class.active]="activeLang() === option"
+            [class.blocked]="langHasIssue(option)"
             [attr.aria-pressed]="activeLang() === option"
-            [attr.aria-label]="langNames[option]"
+            [attr.aria-label]="langLabel(option)"
             (click)="activeLang.set(option)"
           >
             {{ option.toUpperCase() }}
@@ -72,18 +73,39 @@
     }
 
     <ul class="rows">
-      @for (item of items(); track $index) {
+      @for (item of items(); track $index; let row = $index) {
         <li>
-          <details class="row" [open]="isExpanded($index)">
-            <summary class="row-head" (click)="$event.preventDefault(); toggle($index)">
+          <details class="row" [open]="isExpanded(row)">
+            <summary class="row-head" (click)="$event.preventDefault(); toggle(row)">
               <span class="row-title">{{ titleFor(item) }}</span>
+              <!--
+                Lo que falta se dice, no sólo se pinta: el rojo del borde no
+                llega a quien no lo ve, y la fila puede estar plegada.
+              -->
+              @if (rowHasIssue(item)) {
+                <span class="row-issue">Falta completar</span>
+              }
               <span class="marker" aria-hidden="true"></span>
             </summary>
 
             <div class="row-body">
+              <!--
+                Los campos se recorren con `row` y no con `$index`: dentro de
+                este segundo `@for` el `$index` es el del campo, así que cada
+                valor terminaba escrito en la fila que coincidía con la posición
+                del campo —el nombre en la segunda, el identificador en la
+                primera— en vez de en la que se estaba editando.
+              -->
               @for (field of spec().fields; track field.key) {
-                <p class="field" [class.wide]="field.kind === 'textarea' || field.kind === 'list'">
-                  <label [attr.for]="field.key + '-' + $index">
+                @let issue = issueOf(item, field);
+
+                <p
+                  class="field"
+                  [class.wide]="
+                    field.kind === 'textarea' || field.kind === 'list' || field.kind === 'image'
+                  "
+                >
+                  <label [attr.for]="field.key + '-' + row">
                     {{ field.label }}
                     @if (field.perLang) {
                       <span class="tag">{{ activeLang() }}</span>
@@ -96,56 +118,106 @@
                   @switch (field.kind) {
                     @case ('textarea') {
                       <textarea
-                        [id]="field.key + '-' + $index"
+                        [id]="field.key + '-' + row"
                         rows="3"
                         [value]="valueOf(item, field)"
-                        (input)="update($index, field, $any($event.target).value)"
+                        [class.invalid]="!!issue"
+                        [attr.aria-invalid]="!!issue"
+                        [attr.aria-describedby]="issue ? field.key + '-' + row + '-issue' : null"
+                        (input)="update(row, field, $any($event.target).value)"
+                        (blur)="leaveField(row, field, $any($event.target).value)"
                       ></textarea>
                     }
                     @case ('list') {
                       <textarea
-                        [id]="field.key + '-' + $index"
+                        [id]="field.key + '-' + row"
                         rows="4"
                         placeholder="Uno por renglón"
                         [value]="valueOf(item, field)"
-                        (input)="update($index, field, $any($event.target).value)"
+                        [class.invalid]="!!issue"
+                        [attr.aria-invalid]="!!issue"
+                        [attr.aria-describedby]="issue ? field.key + '-' + row + '-issue' : null"
+                        (input)="update(row, field, $any($event.target).value)"
+                        (blur)="leaveField(row, field, $any($event.target).value)"
                       ></textarea>
                     }
                     @case ('color') {
                       <span class="color-field">
                         <input
-                          [id]="field.key + '-' + $index"
+                          [id]="field.key + '-' + row"
                           type="color"
                           [value]="valueOf(item, field) || '#000000'"
-                          (input)="update($index, field, $any($event.target).value)"
+                          [class.invalid]="!!issue"
+                          [attr.aria-invalid]="!!issue"
+                          [attr.aria-describedby]="issue ? field.key + '-' + row + '-issue' : null"
+                          (input)="update(row, field, $any($event.target).value)"
+                          (blur)="leaveField(row, field, $any($event.target).value)"
                         />
                         <span class="color-value">{{ valueOf(item, field) }}</span>
                       </span>
                     }
+                    @case ('image') {
+                      <span class="icon-field">
+                        <!--
+                          Siempre con `<img>`: ahí el navegador no ejecuta lo
+                          que pueda traer un SVG. Incrustarlo en el documento
+                          sería otra cosa, y por eso no se hace.
+                        -->
+                        @if (valueOf(item, field); as icon) {
+                          <img class="icon-preview" [src]="icon | iconSource" alt="" />
+                        }
+                        <input
+                          [id]="field.key + '-' + row"
+                          type="file"
+                          [accept]="iconAccept"
+                          (change)="pickIcon(row, field, $any($event.target))"
+                        />
+                        @if (valueOf(item, field)) {
+                          <button type="button" class="ghost" (click)="clearIcon(row, field)">
+                            Quitar
+                          </button>
+                        }
+                      </span>
+
+                      @if (iconRejection(row); as rejection) {
+                        <span class="field-issue" role="alert">{{ rejection }}</span>
+                      }
+                    }
                     @case ('number') {
                       <input
-                        [id]="field.key + '-' + $index"
+                        [id]="field.key + '-' + row"
                         type="number"
                         [value]="valueOf(item, field)"
-                        (input)="update($index, field, $any($event.target).value)"
+                        [class.invalid]="!!issue"
+                        [attr.aria-invalid]="!!issue"
+                        [attr.aria-describedby]="issue ? field.key + '-' + row + '-issue' : null"
+                        (input)="update(row, field, $any($event.target).value)"
+                        (blur)="leaveField(row, field, $any($event.target).value)"
                       />
                     }
                     @default {
                       <input
-                        [id]="field.key + '-' + $index"
+                        [id]="field.key + '-' + row"
                         type="text"
                         [value]="valueOf(item, field)"
-                        (input)="update($index, field, $any($event.target).value)"
+                        [class.invalid]="!!issue"
+                        [attr.aria-invalid]="!!issue"
+                        [attr.aria-describedby]="issue ? field.key + '-' + row + '-issue' : null"
+                        (input)="update(row, field, $any($event.target).value)"
+                        (blur)="leaveField(row, field, $any($event.target).value)"
                       />
                     }
+                  }
+                  @if (issue) {
+                    <span class="field-issue" [id]="field.key + '-' + row + '-issue'">{{ issue }}</span>
                   }
                 </p>
               }
 
               <div class="row-actions">
-                <button type="button" class="ghost" (click)="move($index, -1)">Subir</button>
-                <button type="button" class="ghost" (click)="move($index, 1)">Bajar</button>
-                <button type="button" class="danger" (click)="remove($index)">Eliminar</button>
+                <button type="button" class="ghost" (click)="move(row, -1)">Subir</button>
+                <button type="button" class="ghost" (click)="move(row, 1)">Bajar</button>
+                <button type="button" class="danger" (click)="remove(row)">Eliminar</button>
               </div>
             </div>
           </details>

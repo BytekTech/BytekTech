@@ -1,22 +1,42 @@
 <article class="tile" [style.--brand]="brandColor()">
   <div class="mark" aria-hidden="true">
-    <div class="pattern">
-      @for (bit of bits(); track $index) {
-        <span class="cell" [class.on]="bit"></span>
-      }
-    </div>
+    <!--
+      Con logotipo propio se muestra el logotipo; sin él, el patrón generado a
+      partir del nombre. Siempre con `<img>`: dentro de un `<img>` el navegador
+      no ejecuta lo que pueda traer un SVG.
+    -->
+    @if (client().icon; as icon) {
+      <img class="logo" [src]="icon | iconSource" alt="" />
+    } @else {
+      <div class="pattern">
+        @for (bit of bits(); track $index) {
+          <span class="cell" [class.on]="bit"></span>
+        }
+      </div>
+    }
   </div>
 
   <div class="body">
-    <h3 class="name">
-      @if (client().website) {
-        <a [href]="client().website" target="_blank" rel="noopener noreferrer">
+    <div class="heading">
+      <h3 class="name">
+        @if (client().website) {
+          <a [href]="client().website" target="_blank" rel="noopener noreferrer">
+            {{ client().name }}
+          </a>
+        } @else {
           {{ client().name }}
-        </a>
-      } @else {
-        {{ client().name }}
+        }
+      </h3>
+
+      <!--
+        Desde cuándo, al lado del nombre: la antigüedad es parte de la prueba.
+        Sin año declarado no se inventa un "desde" suelto.
+      -->
+      @if (client().since) {
+        <p class="since">{{ t().clients.since }} {{ client().since }}</p>
       }
-    </h3>
+    </div>
+
     <p class="reason">{{ copy().summary }}</p>
   </div>
 </article>

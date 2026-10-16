@@ -11,11 +11,16 @@ export type MarqueeDirection = 'left' | 'right';
 export const MAX_FRAME_MS = 64;
 
 /**
- * Tope de copias del listado: más allá de esto el hueco ya no es el problema.
- * Da para tapar una pantalla ancha aun con una lista de un solo elemento, que
- * es el caso en el que cada copia mide poco y hacen falta muchas.
+ * Tope de marcas en la cinta, contando las copias. El límite que importa es
+ * cuántos nodos termina teniendo la fila, no cuántas veces se repite el
+ * listado: con una lista corta cada copia mide poco y hacen falta muchas para
+ * tapar una pantalla ancha, así que topear las copias dejaba el hueco a la
+ * vista justo en el caso que el tope pretendía cubrir.
  */
-export const MAX_COPIES = 20;
+export const MAX_MARKS = 240;
+
+/** Copias mínimas para que el bucle cierre: una corre mientras la otra entra. */
+const MIN_COPIES = 2;
 
 /**
  * Envuelve una posición dentro del bucle `[0, span)`. Al pasar el final vuelve
@@ -47,11 +52,23 @@ export function directionSign(direction: MarqueeDirection): number {
 /**
  * Cuántas veces repetir el listado para que, corrido el ancho de una copia, el
  * resto siga tapando la ventana. Con menos copias el bucle deja un hueco.
+ *
+ * `itemCount` entra en la cuenta para que el tope sea de marcas y no de copias:
+ * un listado de una sola marca puede repetirse muchas veces sin que la cinta
+ * engorde, y es el que más repeticiones necesita.
  */
-export function copiesNeeded(viewportWidth: number, copyWidth: number): number {
-  if (copyWidth <= 0) {
+export function copiesNeeded(
+  viewportWidth: number,
+  copyWidth: number,
+  itemCount: number,
+): number {
+  if (copyWidth <= 0 || itemCount <= 0) {
     return 1;
   }
+
   const needed = Math.ceil(viewportWidth / copyWidth) + 1;
-  return Math.min(Math.max(needed, 2), MAX_COPIES);
+  const affordable = Math.floor(MAX_MARKS / itemCount);
+  // El mínimo manda sobre el tope: sin dos copias no hay bucle, por larga que
+  // sea la lista.
+  return Math.max(Math.min(needed, affordable), MIN_COPIES);
 }

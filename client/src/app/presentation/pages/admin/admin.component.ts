@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { IconSourcePipe } from '../../shared/icon-source.pipe';
 import { Meta } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 import { Lang, SUPPORTED_LANGS } from '../../../domain/models/language.model';
@@ -15,7 +16,28 @@ import { ContentSection, SiteContent } from '../../../domain/models/site-content
 import { ContentRepository } from '../../../domain/repositories/content.repository';
 import { AdminSessionGateway } from '../../../domain/gateways/admin-session.gateway';
 import { ContentEditorGateway } from '../../../domain/gateways/content-editor.gateway';
-import { EditableItem, FieldSpec, SECTION_SPECS, specFor } from './content-fields';
+import { ICON_MAX_BYTES, IconIssue, iconIssue } from '../../../domain/models/client-icon';
+import {
+  EditableItem,
+  explainIconIssue,
+  FieldSpec,
+  fieldIssue,
+  ICON_ACCEPT,
+  itemBlocksPublishing,
+  langBlocksPublishing,
+  SECTION_SPECS,
+  specFor,
+} from './content-fields';
+
+/** Lee el archivo como data URI. Devuelve vacío si el navegador no pudo. */
+function readAsDataUri(file: File): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
+  });
+}
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
 
@@ -24,9 +46,11 @@ type Draft = Record<ContentSection, EditableItem[]>;
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterLink],
+  imports: [RouterLink, IconSourcePipe],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.scss',
+  // Tres hojas, en orden de afuera hacia adentro: la cáscara, la lista de
+  // entradas y los campos de una entrada abierta.
+  styleUrls: ['./admin.component.scss', './admin-rows.scss', './admin-fields.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminComponent {
@@ -53,10 +77,23 @@ export class AdminComponent {
   private readonly draft = signal<Draft | null>(null);
   /**
    * Qué filas están abiertas: la lista se lee de un vistazo y se edita de a una.
-   * Se sigue por posición y no por id, porque el id es justamente uno de los
-   * campos que se pueden estar editando.
+   * Se sigue por posición, que es como las identifican las acciones de la fila
+   * —subir, bajar, eliminar— y lo que cambia cuando se reordenan.
    */
   private readonly expanded = signal<ReadonlySet<number>>(new Set());
+
+  /**
+   * Si hay que señalar lo que falta. Se enciende recién con el primer rechazo:
+   * una fila recién agregada está vacía por definición, y recibirla ya en rojo
+   * sería retarle al usuario por algo que todavía no hizo. Una vez encendido se
+   * apaga campo por campo, a medida que se completan.
+   */
+  private readonly showIssues = signal(false);
+
+  /** El último icono rechazado, con su motivo. Se elige de a un archivo por vez. */
+  private readonly rejectedIcon = signal<{ row: number; message: string } | null>(null);
+
+  readonly iconAccept = ICON_ACCEPT;
 
   readonly spec = computed(() => specFor(this.activeSection()));
   readonly items = computed(() => this.draft()?.[this.activeSection()] ?? []);
@@ -98,6 +135,40 @@ export class AdminComponent {
     return raw === undefined || raw === null ? '' : String(raw);
   }
 
+  /**
+   * Qué le falta a este campo para poder publicar, o `null` si no le falta
+   * nada. El borde rojo solo decía que algo estaba mal; esto dice qué.
+   */
+  issueOf(item: EditableItem, field: FieldSpec): string | null {
+    return this.showIssues() ? fieldIssue(item, field, this.activeLang()) : null;
+  }
+
+  /** Si a la fila le falta algo, en cualquier campo y en cualquier idioma. */
+  rowHasIssue(item: EditableItem): boolean {
+    return this.showIssues() && itemBlocksPublishing(item, this.spec());
+  }
+
+  /**
+   * Si lo que falta está en el otro idioma. Sin esto el rechazo era un misterio:
+   * el campo incompleto estaba en inglés, la pantalla mostraba el español y no
+   * había nada en rojo a la vista.
+   */
+  langHasIssue(lang: Lang): boolean {
+    return (
+      this.showIssues() &&
+      this.items().some((item) => langBlocksPublishing(item, this.spec(), lang))
+    );
+  }
+
+  /**
+   * Nombre del idioma para el lector de pantalla. El rojo del botón no se
+   * anuncia solo: quien no lo ve necesita que lo diga el nombre.
+   */
+  langLabel(lang: Lang): string {
+    const name = this.langNames[lang];
+    return this.langHasIssue(lang) ? `${name} — faltan campos` : name;
+  }
+
   update(index: number, field: FieldSpec, rawValue: string): void {
     const value = this.parse(field, rawValue);
     this.editItem(index, (item) => {
@@ -112,9 +183,76 @@ export class AdminComponent {
     });
   }
 
+  /**
+   * Toma el archivo elegido, lo revisa entero y lo guarda embebido.
+   *
+   * El rechazo se dice acá y no al publicar: quien acaba de elegir un archivo
+   * necesita enterarse en el momento de que ese no va, y con qué se queda corto.
+   */
+  async pickIcon(row: number, field: FieldSpec, input: HTMLInputElement): Promise<void> {
+    const file = input.files?.[0];
+    // Devolver el control a cero deja volver a elegir el mismo archivo después
+    // de corregirlo; si no, el navegador no avisa de nuevo.
+    input.value = '';
+    this.rejectedIcon.set(null);
+    if (!file) {
+      return;
+    }
+
+    // El peso se mira antes de leerlo: no tiene sentido cargar en memoria algo
+    // que ya se sabe que no entra.
+    if (file.size > ICON_MAX_BYTES) {
+      this.rejectIcon(row, 'weight');
+      return;
+    }
+
+    const source = await readAsDataUri(file);
+    if (!source) {
+      this.rejectIcon(row, 'unreadable');
+      return;
+    }
+
+    const issue = iconIssue(source);
+    if (issue) {
+      this.rejectIcon(row, issue);
+      return;
+    }
+    this.update(row, field, source);
+  }
+
+  clearIcon(row: number, field: FieldSpec): void {
+    this.rejectedIcon.set(null);
+    this.update(row, field, '');
+  }
+
+  /** El motivo por el que se rechazó el último archivo elegido en esa fila. */
+  iconRejection(row: number): string | null {
+    const rejected = this.rejectedIcon();
+    return rejected?.row === row ? rejected.message : null;
+  }
+
+  private rejectIcon(row: number, issue: IconIssue): void {
+    this.rejectedIcon.set({ row, message: explainIconIssue(issue) });
+  }
+
+  /**
+   * Arregla al salir del campo lo que fue una omisión y no un error: escribir
+   * el sitio sin el `https://` es lo que hace cualquiera, y el servidor lo
+   * rechazaba entero por eso. Se hace al salir y no en cada tecla para no
+   * pelearse con quien está escribiendo.
+   */
+  leaveField(index: number, field: FieldSpec, rawValue: string): void {
+    const normalized = field.normalize?.(rawValue);
+    if (normalized !== undefined && normalized !== rawValue) {
+      this.update(index, field, normalized);
+    }
+  }
+
   add(): void {
     this.editSection((items) => [...items, this.spec().blank()]);
-    this.toggle(this.items().length - 1);
+    // Sólo queda abierta la fila nueva: es la única que hay que completar, y la
+    // lista se sigue leyendo de un vistazo en vez de crecer desplegada.
+    this.expanded.set(new Set([this.items().length - 1]));
   }
 
   remove(index: number): void {
@@ -167,9 +305,13 @@ export class AdminComponent {
       // volver al sitio sin recargar seguía mostrando lo de antes de publicar.
       this.content.refresh();
       this.saveState.set('saved');
+      this.showIssues.set(false);
     } catch (error) {
       this.saveState.set('failed');
       this.saveError.set(this.explain(error));
+      // El servidor dice que algo no pasa, no cuál: a partir de acá el panel
+      // señala en rojo todo lo que él mismo sabe que va a hacerlo rechazar.
+      this.showIssues.set(true);
     }
   }
 
@@ -195,6 +337,7 @@ export class AdminComponent {
     this.activeSection.set(section);
     this.expanded.set(new Set());
     this.saveState.set('idle');
+    this.showIssues.set(false);
   }
 
   private editSection(change: (items: EditableItem[]) => EditableItem[]): void {

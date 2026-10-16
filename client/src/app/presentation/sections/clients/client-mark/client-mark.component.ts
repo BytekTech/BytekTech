@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { Client } from '../../../../domain/models/client.model';
 import { LanguageService } from '../../../../application/language.service';
 import { bitPattern } from '../../../shared/bit-pattern';
+import { IconSourcePipe } from '../../../shared/icon-source.pipe';
 
 /**
  * Semilla del patrón: cinco caracteres, los mismos que tiene "bytek". Sin
@@ -14,6 +15,7 @@ function markSeed(name: string): string {
 
 @Component({
   selector: 'app-client-mark',
+  imports: [IconSourcePipe],
   templateUrl: './client-mark.component.html',
   styleUrl: './client-mark.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,6 +23,7 @@ function markSeed(name: string): string {
 export class ClientMarkComponent {
   private readonly language = inject(LanguageService);
 
+  readonly t = this.language.t;
   readonly client = input.required<Client>();
 
   readonly copy = computed(() => this.client().copy[this.language.lang()]);

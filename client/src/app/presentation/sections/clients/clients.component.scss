@@ -17,7 +17,7 @@
   // Sin esto las cintas se estirarían al alto del contenedor en vez de medir
   // lo que mide su contenido.
   align-items: flex-start;
-  gap: var(--space-5);
+  gap: var(--space-7);
   overflow: hidden;
   // El recorte de la cinta le comía el borde a la marca agrandada: el aire de
   // arriba y de abajo es el que necesita para crecer, sombra incluida.

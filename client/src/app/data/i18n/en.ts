@@ -53,6 +53,7 @@ export const EN: Translations = {
     subtitle:
       'Companies that trusted us with the software their operation runs on, and stayed.',
     carouselLabel: 'Bytek clients, on a continuous loop',
+    since: 'since',
   },
   process: {
     eyebrow: 'process',

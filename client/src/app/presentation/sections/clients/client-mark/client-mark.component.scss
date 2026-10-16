@@ -34,6 +34,31 @@
   }
 }
 
+// El logotipo ocupa el mismo cuadro que dibujaría el patrón generado, para que
+// la cinta mantenga el pulso venga un cliente con logo o sin él.
+.logo {
+  display: block;
+  width: 4.25rem;
+  height: 4.25rem;
+  // El logo entra entero y sin deformarse: un rectángulo apaisado y uno
+  // vertical tienen que caber en el mismo cuadro.
+  object-fit: contain;
+  // Misma regla que las marcas generadas: en reposo la cinta es monocroma para
+  // que ninguna empresa le gane la atención a las otras, y el color propio es
+  // el premio del hover.
+  filter: grayscale(1);
+  opacity: 0.75;
+  transition:
+    filter var(--duration-base) var(--ease),
+    opacity var(--duration-base) var(--ease);
+
+  .tile:hover &,
+  .tile:focus-within & {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+}
+
 .pattern {
   display: grid;
   grid-template-rows: repeat(8, 0.4rem);
@@ -86,8 +111,31 @@
   }
 }
 
-.name {
+// El nombre manda y el año acompaña: por eso van en la misma línea, alineados
+// por la base de la letra y no por la caja, que con dos tamaños distintos los
+// dejaría visiblemente corridos.
+.heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
   margin: 0 0 var(--space-2);
+}
+
+// Dice desde cuándo sin pelearle la atención al nombre: misma familia mono que
+// el resto de los datos de la casa, un escalón más chico y en gris.
+.since {
+  flex: none;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: var(--steel-light);
+}
+
+.name {
+  margin: 0;
   font-size: var(--text-base);
   font-weight: 600;
   letter-spacing: -0.01em;
