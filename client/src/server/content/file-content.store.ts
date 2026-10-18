@@ -1,9 +1,9 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
-import { SiteContent, CONTENT_SECTIONS } from '../../app/domain/models/site-content.model';
+import { SiteContent } from '../../app/domain/models/site-content.model';
 import { ContentStore } from './content.store';
 import { seedContent } from '../../app/data/content/seed-content';
-import { validateSection } from './content.validation';
+import { parseContent } from './content.parsing';
 
 /**
  * Contenido guardado en un archivo JSON.
@@ -13,7 +13,7 @@ import { validateSection } from './content.validation';
  * En un entorno serverless el disco es efímero —lo escrito se pierde al
  * reciclarse la instancia—, así que ahí este store hay que reemplazarlo por uno
  * contra una base. Cambiar de motor es escribir otro ContentStore: nada más
- * del servidor sabe de archivos.
+ * del servidor sabe de archivos. En Vercel se usa `RedisContentStore`.
  */
 export class FileContentStore implements ContentStore {
   private cached: SiteContent | null = null;
@@ -61,34 +61,7 @@ export class FileContentStore implements ContentStore {
   }
 }
 
-/**
- * Lo que vuelve del disco se valida igual que lo que llega por la red: un
- * archivo editado a mano tiene los mismos errores posibles que un formulario.
- */
-function parseContent(raw: unknown): SiteContent {
-  if (typeof raw !== 'object' || raw === null) {
-    throw new Error('INVALID_CONTENT');
-  }
-  const source = raw as Record<string, unknown>;
-  const fallback = seedContent();
-  const content = {} as SiteContent;
-
-  for (const section of CONTENT_SECTIONS) {
-    if (source[section] === undefined) {
-      content[section] = fallback[section] as never;
-      continue;
-    }
-    const validated = validateSection(section, source[section]);
-    if (!validated.ok) {
-      throw new Error(validated.error);
-    }
-    content[section] = validated.value as never;
-  }
-
-  return content;
-}
-
 /** Ruta del archivo de contenido, configurable para no atarla al layout del deploy. */
 export function defaultContentPath(): string {
-  return process.env['CONTENT_FILE'] ?? resolve(process.cwd(), '.data', 'content.json');
+  return process.env['CONTENT_FILE'] || resolve(process.cwd(), '.data', 'content.json');
 }

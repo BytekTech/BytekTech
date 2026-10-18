@@ -19,7 +19,31 @@
   } @else if (!isAuthenticated()) {
     <form class="login" (submit)="$event.preventDefault(); login(password.value)">
       <label for="admin-password">Clave del panel</label>
-      <input id="admin-password" #password type="password" autocomplete="current-password" required />
+      <span class="password-field">
+        <input
+          id="admin-password"
+          #password
+          [type]="isPasswordVisible() ? 'text' : 'password'"
+          autocomplete="current-password"
+          required
+        />
+        <button
+          type="button"
+          class="reveal"
+          [attr.aria-pressed]="isPasswordVisible()"
+          [attr.aria-label]="isPasswordVisible() ? 'Ocultar clave' : 'Mostrar clave'"
+          aria-controls="admin-password"
+          (click)="togglePasswordVisibility()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" />
+            <circle cx="12" cy="12" r="3" />
+            @if (isPasswordVisible()) {
+              <path d="M3 3l18 18" />
+            }
+          </svg>
+        </button>
+      </span>
       <button type="submit" class="primary">Entrar</button>
       @if (loginError()) {
         <p class="error" role="alert">{{ loginError() }}</p>

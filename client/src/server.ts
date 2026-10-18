@@ -8,7 +8,7 @@ import express from 'express';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleContact } from './server/contact.handler';
-import { FileContentStore } from './server/content/file-content.store';
+import { createContentStore } from './server/content/content-store.factory';
 import { getContent, putSection } from './server/content/content.handler';
 import {
   handleLogin,
@@ -25,7 +25,7 @@ const angularApp = new AngularNodeAppEngine();
 
 // Un único almacén para todo el proceso: la caché en memoria sólo sirve si
 // las peticiones comparten la misma instancia.
-const contentStore = new FileContentStore();
+const contentStore = createContentStore();
 
 /**
  * API endpoints. Deben registrarse antes del handler de Angular.

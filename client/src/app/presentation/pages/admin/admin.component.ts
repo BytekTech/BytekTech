@@ -68,6 +68,8 @@ export class AdminComponent {
   readonly isAuthenticated = signal(false);
   readonly isChecking = signal(true);
   readonly loginError = signal('');
+  /** Si la clave se ve en claro: quien la escribe a ciegas no tiene cómo notar un error de tipeo. */
+  readonly isPasswordVisible = signal(false);
 
   readonly activeSection = signal<ContentSection>('clients');
   readonly activeLang = signal<Lang>('es');
@@ -272,6 +274,10 @@ export class AdminComponent {
     });
   }
 
+  togglePasswordVisibility(): void {
+    this.isPasswordVisible.update((visible) => !visible);
+  }
+
   async login(password: string): Promise<void> {
     this.loginError.set('');
     try {
@@ -370,8 +376,13 @@ export class AdminComponent {
 
   /** Traduce el motivo del rechazo a algo accionable, sin filtrar detalles del servidor. */
   private explain(error: unknown): string {
-    const code = (error as { error?: { error?: string } })?.error?.error;
-    switch (code) {
+    const response = error as { status?: number; error?: { error?: string } };
+    // El límite de tamaño lo corta el servidor antes de leer el pedido: no
+    // llega con código propio, sólo con el estado.
+    if (response?.status === 413) {
+      return 'La sección pesa demasiado para publicarla de una vez. Probá con íconos más livianos.';
+    }
+    switch (response?.error?.error) {
       case 'INVALID_ITEM':
         return 'Hay un campo vacío o fuera de rango. Revisá que estén completos los dos idiomas.';
       case 'DUPLICATE_ID':
@@ -382,6 +393,8 @@ export class AdminComponent {
         return 'La sesión venció. Volvé a entrar.';
       case 'ADMIN_NOT_CONFIGURED':
         return 'El panel no tiene configuradas sus claves en el servidor.';
+      case 'CONTENT_NOT_SAVED':
+        return 'El servidor no pudo guardar el contenido. Revisá la configuración del almacenamiento.';
       default:
         return 'No se pudo guardar. Probá de nuevo.';
     }
