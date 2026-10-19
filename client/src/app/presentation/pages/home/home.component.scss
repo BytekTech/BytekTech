@@ -56,11 +56,8 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(
-    ellipse 55% 45% at 78% 24%,
-    rgb(var(--shadow-color) / 7%),
-    transparent 70%
-  );
+  --halo: rgb(var(--shadow-color) / 7%);
+  background: radial-gradient(ellipse 55% 45% at 78% 24%, var(--halo), transparent 70%);
 }
 
 .hero-inner {

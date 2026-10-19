@@ -37,7 +37,7 @@ describe('routes', () => {
   it('abre el panel sin la cáscara del sitio', async () => {
     await harness.navigateByUrl('/admin');
     const page = TestBed.inject(Router).routerState.snapshot.url;
-    const shell = document.querySelector('app-header, app-footer, app-chatbot');
+    const shell = document.querySelector('app-header, app-footer');
 
     expect(page).toBe('/admin');
     expect(shell).toBeNull();

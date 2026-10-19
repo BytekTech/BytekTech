@@ -7,6 +7,11 @@ describe('ThemeService', () => {
     localStorage.removeItem(THEME_STORAGE_KEY);
     delete document.documentElement.dataset['theme'];
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] });
+    // El fundido real espera al próximo cuadro; acá interesa qué escribe, no cuándo.
+    spyOn(document, 'startViewTransition').and.callFake((update) => {
+      (update as ViewTransitionUpdateCallback)();
+      return {} as ViewTransition;
+    });
   });
 
   afterEach(() => {
@@ -30,6 +35,16 @@ describe('ThemeService', () => {
     expect(service.theme()).not.toBe(initial);
     expect(document.documentElement.dataset['theme']).toBe(service.theme());
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe(service.theme());
+  });
+
+  it('cruza al tema nuevo con una única transición de vista', () => {
+    const service = TestBed.inject(ThemeService);
+    TestBed.tick();
+
+    service.toggle();
+    TestBed.tick();
+
+    expect(document.startViewTransition).toHaveBeenCalledTimes(1);
   });
 
   it('vuelve al tema anterior al alternar dos veces', () => {

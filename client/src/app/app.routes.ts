@@ -11,7 +11,7 @@ import { LEGACY_TERMS_SLUGS, pathFor, routeFor } from './application/i18n/site-p
  * para que ningún enlace ya compartido termine en un 404.
  *
  * Todo lo público vive dentro del layout del sitio. El panel queda fuera a
- * propósito: es la trastienda, y entra sin barra, sin pie y sin chat.
+ * propósito: es la trastienda, y entra sin barra y sin pie.
  */
 export const routes: Routes = [
   {

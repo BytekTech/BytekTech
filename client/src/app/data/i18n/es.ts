@@ -83,13 +83,6 @@ export const ES: Translations = {
       emailError: 'Ingresá un email válido',
     },
   },
-  chatbot: {
-    open: 'Abrir asistente de preguntas frecuentes',
-    close: 'Cerrar asistente',
-    title: 'bytek // asistente',
-    greeting: 'Hola, soy el asistente de Bytek. Elegí una pregunta y te cuento.',
-    prompt: 'preguntas frecuentes',
-  },
   terms: {
     meta: {
       title: 'Términos y condiciones — Bytek Technology',

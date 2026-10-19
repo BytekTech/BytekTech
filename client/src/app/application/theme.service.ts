@@ -6,8 +6,8 @@ import { resolveTheme } from './theme/resolve-theme';
 export const THEME_STORAGE_KEY = 'bytek.theme';
 
 const TRANSITION_CLASS = 'theme-transition';
-/** Debe cubrir la duración declarada en styles.scss, con margen para el repintado. */
-const TRANSITION_MS = 400;
+/** Debe cubrir `--duration-theme` de styles.scss, con margen para el repintado. */
+const TRANSITION_MS = 550;
 
 /** Tiene que ser el mismo valor que `--paper` en cada tema: es el color con el
  *  que el navegador pinta su propia barra, y cualquier desfase se ve como una
@@ -55,15 +55,26 @@ export class ThemeService {
   }
 
   private apply(theme: Theme): void {
-    const root = this.document.documentElement;
-
     if (this.isFirstApply) {
       this.isFirstApply = false;
+      this.write(theme);
+    } else if (this.document.startViewTransition) {
+      this.document.startViewTransition(() => this.write(theme));
     } else {
-      this.startTransition(root);
+      this.startTransition(this.document.documentElement);
+      this.write(theme);
     }
+  }
 
-    root.dataset['theme'] = theme;
+  /**
+   * Con View Transitions el navegador funde una captura de la página vieja con
+   * la nueva, de una sola vez. Cruzando elemento por elemento, cada hijo que
+   * hereda el color arranca su transición detrás del padre y el cambio llega a
+   * destiempo: el texto, los bordes y los fondos no terminan juntos. El cruce
+   * por clase queda para los navegadores que todavía no lo soportan.
+   */
+  private write(theme: Theme): void {
+    this.document.documentElement.dataset['theme'] = theme;
     localStorage.setItem(THEME_STORAGE_KEY, theme);
 
     // La barra del navegador en móvil acompaña al fondo de la página.
@@ -73,7 +84,7 @@ export class ThemeService {
   }
 
   /**
-   * Habilita el cruce de colores y lo retira al terminar. El reflow forzado no
+   * Respaldo sin View Transitions: habilita el cruce de colores y lo retira al terminar. El reflow forzado no
    * es decorativo: sin él el navegador aplica la clase y el nuevo tema en el
    * mismo recálculo, no encuentra un valor previo desde el cual interpolar y
    * el cambio salta de golpe.

@@ -9,6 +9,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IconSourcePipe } from '../../shared/icon-source.pipe';
+import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 import { Meta } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 import { Lang, SUPPORTED_LANGS } from '../../../domain/models/language.model';
@@ -46,7 +47,7 @@ type Draft = Record<ContentSection, EditableItem[]>;
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterLink, IconSourcePipe],
+  imports: [RouterLink, IconSourcePipe, ThemeToggleComponent],
   templateUrl: './admin.component.html',
   // Tres hojas, en orden de afuera hacia adentro: la cáscara, la lista de
   // entradas y los campos de una entrada abierta.

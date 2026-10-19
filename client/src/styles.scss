@@ -178,6 +178,11 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --duration-fast: 150ms;
   --duration-base: 250ms;
+  /* El cruce de tema es simétrico y más largo que una transición de interfaz:
+     con una curva de salida casi todo el cambio caía al principio y se leía
+     como un salto. ThemeService espera este mismo tiempo para retirar la clase. */
+  --duration-theme: 450ms;
+  --ease-theme: cubic-bezier(0.45, 0, 0.55, 1);
 
   /* Layout */
   --content-max: 76rem;
@@ -274,20 +279,51 @@ button {
 }
 
 /*
- * Cruce entre temas. La clase la pone y la saca ThemeService alrededor del
- * cambio; fuera de ese instante ningún elemento arrastra estas transiciones.
+ * Colores que se usan dentro de un gradiente. Un background-image no se
+ * interpola, así que esos fondos cambiaban de golpe en medio del cruce; como
+ * propiedades registradas el navegador sí sabe interpolarlas.
+ */
+@property --grid-line {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+@property --halo {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
+}
+
+/*
+ * Cruce entre temas con View Transitions: un único fundido de toda la página.
+ * El resto del sitio no tiene transiciones de vista, así que esto sólo afecta
+ * al cambio de tema.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-theme);
+  animation-timing-function: var(--ease-theme);
+}
+
+/*
+ * Respaldo para navegadores sin View Transitions. La clase la pone y la saca
+ * ThemeService alrededor del cambio; fuera de ese instante ningún elemento
+ * arrastra estas transiciones.
  */
 .theme-transition,
 .theme-transition *,
 .theme-transition *::before,
 .theme-transition *::after {
   transition:
-    background-color 320ms var(--ease),
-    border-color 320ms var(--ease),
-    color 320ms var(--ease),
-    fill 320ms var(--ease),
-    stroke 320ms var(--ease),
-    box-shadow 320ms var(--ease) !important;
+    background-color var(--duration-theme) var(--ease-theme),
+    border-color var(--duration-theme) var(--ease-theme),
+    color var(--duration-theme) var(--ease-theme),
+    fill var(--duration-theme) var(--ease-theme),
+    stroke var(--duration-theme) var(--ease-theme),
+    box-shadow var(--duration-theme) var(--ease-theme),
+    --grid-line var(--duration-theme) var(--ease-theme),
+    --halo var(--duration-theme) var(--ease-theme) !important;
   transition-delay: 0s !important;
 }
 

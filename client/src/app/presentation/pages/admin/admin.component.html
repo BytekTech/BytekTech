@@ -9,6 +9,7 @@
       bytek technology<span class="bit" aria-hidden="true"></span>
       <span class="panel-name">panel</span>
     </h1>
+    <app-theme-toggle toLightLabel="Cambiar a tema claro" toDarkLabel="Cambiar a tema oscuro" />
     @if (isAuthenticated()) {
       <button type="button" class="ghost" (click)="logout()">Cerrar sesión</button>
     }

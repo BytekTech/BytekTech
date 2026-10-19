@@ -4,10 +4,11 @@
 // para separarse. El plano hundido alcanza para que la sección se despegue de
 // la de arriba, y la grilla técnica le deja el aire de hoja de cálculo.
 .metrics {
+  --grid-line: var(--line);
   background-color: var(--surface-sunken);
   background-image:
-    linear-gradient(to right, var(--line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--line) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 4.5rem 4.5rem;
   // Sólo arriba: abajo el borde lo pone la sección de clientes, y los dos
   // juntos dibujaban una línea de doble grosor.
@@ -31,8 +32,6 @@
   display: flex;
   flex: 0 1 calc((100% - 2 * var(--space-6)) / 3);
   flex-direction: column;
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--line-strong);
 }
 
 .label {

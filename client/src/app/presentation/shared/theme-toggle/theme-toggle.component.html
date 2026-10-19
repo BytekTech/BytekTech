@@ -1,0 +1,18 @@
+<button
+  type="button"
+  class="theme-toggle"
+  [attr.aria-label]="actionLabel()"
+  [title]="actionLabel()"
+  (click)="toggle()"
+>
+  @if (theme() === 'dark') {
+    <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.4" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" />
+    </svg>
+  } @else {
+    <svg class="theme-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z" />
+    </svg>
+  }
+</button>

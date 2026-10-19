@@ -88,13 +88,6 @@ export const EN: Translations = {
       emailError: 'Enter a valid email',
     },
   },
-  chatbot: {
-    open: 'Open the FAQ assistant',
-    close: 'Close assistant',
-    title: 'bytek // assistant',
-    greeting: 'Hi, I am the Bytek assistant. Pick a question and I will fill you in.',
-    prompt: 'frequently asked questions',
-  },
   terms: {
     meta: {
       title: 'Terms and conditions — Bytek Technology',

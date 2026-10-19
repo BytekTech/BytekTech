@@ -91,13 +91,6 @@ export interface Translations {
       emailError: string;
     };
   };
-  chatbot: {
-    open: string;
-    close: string;
-    title: string;
-    greeting: string;
-    prompt: string;
-  };
   terms: {
     /** Metadata propia de la página: no comparte título con el one-page. */
     meta: {

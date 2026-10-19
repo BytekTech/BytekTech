@@ -44,14 +44,14 @@
 .head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-5);
+  gap: var(--space-3);
   padding-bottom: var(--space-5);
   border-bottom: 1px solid var(--line-strong);
 }
 
+// Empuja las acciones al otro extremo de la barra.
 .wordmark {
-  margin: 0;
+  margin: 0 auto 0 0;
   font-size: var(--text-lg);
   font-weight: 600;
   letter-spacing: -0.02em;
