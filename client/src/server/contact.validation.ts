@@ -20,7 +20,9 @@ export type ValidationResult =
   | { ok: true; fields: ContactFields }
   | { ok: false; error: ContactValidationError };
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Sin comas, puntos y coma ni corchetes angulares: la dirección va a parar al
+// reply_to, y ahí cualquiera de ellos la convertiría en una lista de destinatarios.
+const EMAIL_PATTERN = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/;
 
 export const MAX_LENGTHS = {
   name: 120,

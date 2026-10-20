@@ -29,7 +29,14 @@ describe('validatePayload', () => {
   });
 
   it('rechaza emails mal formados', () => {
-    for (const email of ['sin-arroba', 'a@b', 'a@b.', '@dominio.com']) {
+    for (const email of [
+      'sin-arroba',
+      'a@b',
+      'a@b.',
+      '@dominio.com',
+      'ana@empresa.com,otro@ajeno.com',
+      'Ana <ana@empresa.com>',
+    ]) {
       expect(validatePayload({ ...valid, email })).toEqual({
         ok: false,
         error: 'INVALID_EMAIL',

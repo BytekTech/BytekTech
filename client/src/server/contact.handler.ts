@@ -1,5 +1,5 @@
-import type { Request, Response } from 'express';
-import { SlidingWindowRateLimiter } from './rate-limit';
+import { clientIp, forwardErrors } from './http';
+import { AttemptLimiter } from './rate-limit';
 import {
   ContactFields,
   ContactPayload,
@@ -8,9 +8,12 @@ import {
   validatePayload,
 } from './contact.validation';
 
-const MAX_SUBMISSIONS = 5;
-const WINDOW_MS = 60 * 60 * 1000;
-const rateLimiter = new SlidingWindowRateLimiter(MAX_SUBMISSIONS, WINDOW_MS);
+/** Cinco mensajes por hora y por IP: de sobra para una persona, poco para un script. */
+export const CONTACT_MAX_SUBMISSIONS = 5;
+export const CONTACT_WINDOW_MS = 60 * 60 * 1000;
+
+/** Si Resend no contesta a tiempo, el visitante recibe un error en vez de una espera eterna. */
+const RESEND_TIMEOUT_MS = 10000;
 
 function buildEmailHtml(fields: ContactFields): string {
   const companyLine = fields.company ? `<p><b>Empresa:</b> ${escapeHtml(fields.company)}</p>` : '';
@@ -44,9 +47,12 @@ async function sendEmail(fields: ContactFields, apiKey: string, to: string): Pro
         from,
         to,
         reply_to: fields.email,
-        subject: `Nuevo contacto — ${fields.name}`,
+        // El asunto es una sola línea: un salto de línea en el nombre no tiene
+        // por qué llegar a una cabecera del correo.
+        subject: `Nuevo contacto — ${fields.name.replace(/[\r\n]+/g, ' ')}`,
         html: buildEmailHtml(fields),
       }),
+      signal: AbortSignal.timeout(RESEND_TIMEOUT_MS),
     });
     return response.ok;
   } catch {
@@ -54,50 +60,46 @@ async function sendEmail(fields: ContactFields, apiKey: string, to: string): Pro
   }
 }
 
-/** IP del cliente detrás del proxy de Vercel, con la conexión directa como respaldo. */
-function clientIp(req: Request): string {
-  const forwarded = req.headers['x-forwarded-for'];
-  const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-  return raw?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
-}
-
 /**
  * Endpoint POST /api/contact: valida el formulario y envía el email
  * vía la API HTTP de Resend (sin dependencia npm adicional).
  * Requiere las env vars RESEND_API_KEY y CONTACT_TO_EMAIL.
+ * Los envíos se cuentan donde diga `submissions`: en Redis, si está.
  */
-export async function handleContact(req: Request, res: Response): Promise<void> {
-  const payload = req.body as ContactPayload;
+export function createContactHandler(submissions: AttemptLimiter) {
+  return forwardErrors(async (req, res) => {
+    const payload = req.body as ContactPayload;
 
-  // Al bot se le responde éxito: si supiera que fue detectado, probaría otra cosa.
-  if (isHoneypotTripped(payload)) {
+    // Al bot se le responde éxito: si supiera que fue detectado, probaría otra cosa.
+    if (isHoneypotTripped(payload)) {
+      res.status(204).end();
+      return;
+    }
+
+    if (!(await submissions.tryConsume(clientIp(req)))) {
+      res.status(429).json({ error: 'TOO_MANY_REQUESTS' });
+      return;
+    }
+
+    const validation = validatePayload(payload);
+    if (!validation.ok) {
+      res.status(400).json({ error: validation.error });
+      return;
+    }
+
+    const apiKey = process.env['RESEND_API_KEY'];
+    const to = process.env['CONTACT_TO_EMAIL'];
+    if (!apiKey || !to) {
+      res.status(503).json({ error: 'EMAIL_NOT_CONFIGURED' });
+      return;
+    }
+
+    const sent = await sendEmail(validation.fields, apiKey, to);
+    if (!sent) {
+      res.status(502).json({ error: 'EMAIL_SEND_FAILED' });
+      return;
+    }
+
     res.status(204).end();
-    return;
-  }
-
-  if (!rateLimiter.tryConsume(clientIp(req))) {
-    res.status(429).json({ error: 'TOO_MANY_REQUESTS' });
-    return;
-  }
-
-  const validation = validatePayload(payload);
-  if (!validation.ok) {
-    res.status(400).json({ error: validation.error });
-    return;
-  }
-
-  const apiKey = process.env['RESEND_API_KEY'];
-  const to = process.env['CONTACT_TO_EMAIL'];
-  if (!apiKey || !to) {
-    res.status(503).json({ error: 'EMAIL_NOT_CONFIGURED' });
-    return;
-  }
-
-  const sent = await sendEmail(validation.fields, apiKey, to);
-  if (!sent) {
-    res.status(502).json({ error: 'EMAIL_SEND_FAILED' });
-    return;
-  }
-
-  res.status(204).end();
+  });
 }

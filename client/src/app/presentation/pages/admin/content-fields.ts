@@ -270,7 +270,7 @@ export function fieldIssue(item: EditableItem, field: FieldSpec, lang: Lang): st
    * El icono no se revalida acá. Se revisa entero al elegirlo —y el servidor
    * lo revisa de nuevo al publicar—, así que lo guardado ya pasó. Repetirlo
    * significaría decodificar su base64 en cada ciclo de detección de cambios,
-   * que para 64 KB por fila se nota.
+   * que para 100 KB por fila se nota.
    */
   if (field.kind === 'image') {
     return null;

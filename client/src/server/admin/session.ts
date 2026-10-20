@@ -1,12 +1,13 @@
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 
 /**
- * Sesión del panel, firmada y sin estado.
+ * Sesión del panel, firmada.
  *
- * No hay tabla de sesiones ni store compartido a propósito: el servidor puede
- * correr en varias instancias a la vez, y una firma con vencimiento se verifica
- * igual en cualquiera de ellas. La cookie no guarda datos, sólo hasta cuándo
- * vale y la prueba de que la emitió esta casa.
+ * No hay tabla de sesiones: el servidor puede correr en varias instancias a la
+ * vez, y una firma con vencimiento se verifica igual en cualquiera de ellas. La
+ * cookie no guarda datos, sólo hasta cuándo vale y la prueba de que la emitió
+ * esta casa. Lo único que se guarda es la lista de las sesiones cerradas antes
+ * de vencer (ver `SessionRevocations`).
  */
 
 /** Ocho horas: una jornada de trabajo, no una sesión eterna en una máquina prestada. */
@@ -57,16 +58,17 @@ export function issueSession(secret: string, now = Date.now()): string {
   return `${expiresAt}.${sign(expiresAt, secret)}`;
 }
 
-export function isSessionValid(token: string | undefined, secret: string, now = Date.now()): boolean {
+/** Hasta cuándo vale el token, o `null` si no lo emitió esta casa o ya venció. */
+export function sessionDeadline(token: string | undefined, secret: string, now = Date.now()): number | null {
   if (!token) {
-    return false;
+    return null;
   }
   const [expiresAt, signature] = token.split('.');
   if (!expiresAt || !signature || !equals(signature, sign(expiresAt, secret))) {
-    return false;
+    return null;
   }
   const deadline = Number(expiresAt);
-  return Number.isFinite(deadline) && deadline > now;
+  return Number.isFinite(deadline) && deadline > now ? deadline : null;
 }
 
 /** Lee una cookie del encabezado crudo, sin sumar una dependencia para esto. */
@@ -77,7 +79,13 @@ export function readCookie(header: string | undefined, name: string): string | u
   for (const part of header.split(';')) {
     const [key, ...rest] = part.trim().split('=');
     if (key === name) {
-      return decodeURIComponent(rest.join('='));
+      // Un `%` suelto hace tirar a decodeURIComponent: una cookie mal formada
+      // es una sesión inexistente, no un 500.
+      try {
+        return decodeURIComponent(rest.join('='));
+      } catch {
+        return undefined;
+      }
     }
   }
   return undefined;

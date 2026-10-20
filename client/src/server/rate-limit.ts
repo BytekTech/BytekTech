@@ -1,4 +1,13 @@
 /**
+ * Puerto de cualquier límite de intentos. Puede responder al instante (en
+ * memoria) o después de consultar un almacén compartido (Redis).
+ */
+export interface AttemptLimiter {
+  /** Registra un intento y devuelve si la clave todavía está dentro del límite. */
+  tryConsume(key: string): boolean | Promise<boolean>;
+}
+
+/**
  * Límite de peticiones por clave con ventana deslizante, en memoria del proceso.
  *
  * En un entorno serverless las instancias se reciclan y conviven varias a la
@@ -6,7 +15,7 @@
  * el abuso trivial (un script disparando el formulario en bucle) sin agregar
  * infraestructura. Un atacante distribuido necesita otra defensa.
  */
-export class SlidingWindowRateLimiter {
+export class SlidingWindowRateLimiter implements AttemptLimiter {
   private readonly hits = new Map<string, number[]>();
 
   constructor(

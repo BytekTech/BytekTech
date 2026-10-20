@@ -18,7 +18,7 @@ export const ICON_FORMATS = ['image/svg+xml', 'image/png', 'image/webp'] as cons
 export type IconFormat = (typeof ICON_FORMATS)[number];
 
 /** Tope de peso del archivo original, antes de la inflación del base64 (~33%). */
-export const ICON_MAX_BYTES = 64 * 1024;
+export const ICON_MAX_BYTES = 100 * 1024;
 
 /**
  * Tope de largo del texto del data URI, que se mira antes de decodificar nada:
