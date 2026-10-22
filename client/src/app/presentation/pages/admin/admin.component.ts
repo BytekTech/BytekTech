@@ -10,7 +10,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { IconSourcePipe } from '../../shared/icon-source.pipe';
 import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
-import { Meta } from '@angular/platform-browser';
+import { Title } from '@angular/platform-browser';
 import { firstValueFrom } from 'rxjs';
 import { Lang, SUPPORTED_LANGS } from '../../../domain/models/language.model';
 import { ContentSection, SiteContent } from '../../../domain/models/site-content.model';
@@ -40,7 +40,12 @@ function readAsDataUri(file: File): Promise<string> {
   });
 }
 
-type SaveState = 'idle' | 'saving' | 'saved' | 'failed';
+/** Si lo que se arrastra son archivos y no, por ejemplo, un texto seleccionado. */
+function carriesFiles(event: DragEvent): boolean {
+  return event.dataTransfer?.types.includes('Files') ?? false;
+}
+
+type SaveState ='idle' | 'saving' | 'saved' | 'failed';
 
 /** Borrador de trabajo: el contenido tal como se está editando, aún sin publicar. */
 type Draft = Record<ContentSection, EditableItem[]>;
@@ -53,12 +58,15 @@ type Draft = Record<ContentSection, EditableItem[]>;
   // entradas y los campos de una entrada abierta.
   styleUrls: ['./admin.component.scss', './admin-rows.scss', './admin-fields.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    '(document:dragover)': 'ignoreStrayDrop($event)',
+    '(document:drop)': 'ignoreStrayDrop($event)',
+  },
 })
 export class AdminComponent {
   private readonly session = inject(AdminSessionGateway);
   private readonly editor = inject(ContentEditorGateway);
   private readonly content = inject(ContentRepository);
-  private readonly meta = inject(Meta);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   readonly langs = SUPPORTED_LANGS;
@@ -96,14 +104,18 @@ export class AdminComponent {
   /** El último icono rechazado, con su motivo. Se elige de a un archivo por vez. */
   private readonly rejectedIcon = signal<{ row: number; message: string } | null>(null);
 
+  /** La fila sobre cuyo campo de icono se está arrastrando un archivo. */
+  private readonly iconDropRow = signal<number | null>(null);
+
   readonly iconAccept = ICON_ACCEPT;
 
   readonly spec = computed(() => specFor(this.activeSection()));
   readonly items = computed(() => this.draft()?.[this.activeSection()] ?? []);
 
   constructor() {
-    // El panel no es contenido del sitio: no tiene por qué aparecer en un buscador.
-    this.meta.updateTag({ name: 'robots', content: 'noindex, nofollow' });
+    // Que no se indexe lo resuelve el SeoService, igual que para el resto de
+    // las páginas; el título es propio porque el panel no se traduce.
+    inject(Title).setTitle('Panel — Bytek Technology');
     // La sesión vive en una cookie del navegador: preguntar por ella durante
     // el render del servidor no tendría a quién preguntarle.
     if (this.isBrowser) {
@@ -192,11 +204,68 @@ export class AdminComponent {
    * El rechazo se dice acá y no al publicar: quien acaba de elegir un archivo
    * necesita enterarse en el momento de que ese no va, y con qué se queda corto.
    */
-  async pickIcon(row: number, field: FieldSpec, input: HTMLInputElement): Promise<void> {
+  pickIcon(row: number, field: FieldSpec, input: HTMLInputElement): Promise<void> {
     const file = input.files?.[0];
     // Devolver el control a cero deja volver a elegir el mismo archivo después
     // de corregirlo; si no, el navegador no avisa de nuevo.
     input.value = '';
+    return this.acceptIcon(row, field, file);
+  }
+
+  /** Lo mismo que elegirlo con el selector, pero soltándolo sobre el campo. */
+  dropIcon(row: number, field: FieldSpec, event: DragEvent): Promise<void> {
+    event.preventDefault();
+    this.iconDropRow.set(null);
+    return this.acceptIcon(row, field, event.dataTransfer?.files[0]);
+  }
+
+  /** Si se está arrastrando un archivo sobre el campo del icono de esa fila. */
+  isIconDropTarget(row: number): boolean {
+    return this.iconDropRow() === row;
+  }
+
+  /**
+   * Habilita soltar sobre el campo. Sólo con archivos: arrastrar un texto
+   * seleccionado no es subir un icono.
+   */
+  dragOverIcon(row: number, event: DragEvent): void {
+    if (!carriesFiles(event)) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+    this.iconDropRow.set(row);
+  }
+
+  /**
+   * Apaga el resaltado al salir del campo. Pasar por encima de la vista previa
+   * o del botón también dispara `dragleave`, y eso no es haberse ido.
+   */
+  leaveIconDrop(event: DragEvent): void {
+    const zone = event.currentTarget as HTMLElement | null;
+    if (!zone?.contains(event.relatedTarget as Node | null)) {
+      this.iconDropRow.set(null);
+    }
+  }
+
+  /**
+   * Un archivo soltado fuera de un campo hace que el navegador lo abra en la
+   * pestaña, y eso se lleva puesto el borrador sin publicar. Fuera de los
+   * campos, soltar no hace nada.
+   */
+  ignoreStrayDrop(event: DragEvent): void {
+    if (event.defaultPrevented || !carriesFiles(event)) {
+      return;
+    }
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'none';
+    }
+  }
+
+  private async acceptIcon(row: number, field: FieldSpec, file: File | undefined): Promise<void> {
     this.rejectedIcon.set(null);
     if (!file) {
       return;

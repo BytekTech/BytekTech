@@ -12,6 +12,8 @@ export interface Translations {
   meta: {
     title: string;
     description: string;
+    /** Qué muestra la imagen que acompaña al enlace compartido: es la misma en todas las páginas. */
+    imageAlt: string;
   };
   skipToContent: string;
   nav: {
@@ -102,6 +104,18 @@ export interface Translations {
     intro: string;
     updatedLabel: string;
     back: string;
+  };
+  /** La página que responde a una dirección que no existe. */
+  notFound: {
+    meta: {
+      title: string;
+      description: string;
+    };
+    eyebrow: string;
+    title: string;
+    intro: string;
+    home: string;
+    contact: string;
   };
   footer: {
     tagline: string;

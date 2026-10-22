@@ -79,4 +79,92 @@ describe('SeoService', () => {
     expect(organization.name).toBe(COMPANY.name);
     expect(organization.sameAs).toEqual(COMPANY.social.map((link) => link.url));
   });
+
+  it('describe la imagen social con su texto, sus medidas y su tipo', async () => {
+    await router.navigateByUrl('/');
+    language.set('en');
+    TestBed.tick();
+
+    expect(head('meta[property="og:image"]')?.getAttribute('content')).toBe(
+      `${COMPANY.siteUrl}/og-image-en.png`,
+    );
+    expect(head('meta[property="og:image:width"]')?.getAttribute('content')).toBe('1200');
+    expect(head('meta[property="og:image:height"]')?.getAttribute('content')).toBe('630');
+    expect(head('meta[property="og:image:type"]')?.getAttribute('content')).toBe('image/png');
+    expect(head('meta[property="og:image:alt"]')?.getAttribute('content')).toContain(
+      'Custom software engineering',
+    );
+    expect(head('meta[name="twitter:image:alt"]')?.getAttribute('content')).toContain(
+      'Custom software engineering',
+    );
+  });
+
+  it('declara el otro idioma como alternativa, una sola vez aunque se cambie varias', async () => {
+    await router.navigateByUrl('/');
+    language.set('en');
+    TestBed.tick();
+    language.set('es');
+    TestBed.tick();
+
+    const alternates = Array.from(
+      document.head.querySelectorAll('meta[property="og:locale:alternate"]'),
+    ).map((tag) => tag.getAttribute('content'));
+    expect(alternates).toEqual(['en_US']);
+  });
+
+  it('el sitio de los datos estructurados es la raíz, también desde los términos', async () => {
+    await router.navigateByUrl('/terms');
+    TestBed.tick();
+    const graph = JSON.parse(document.getElementById('bytek-json-ld')?.textContent ?? '{}');
+    const nodeOf = (type: string) =>
+      graph['@graph'].find((node: { '@type': string }) => node['@type'] === type);
+
+    expect(nodeOf('WebSite').url).toBe(`${COMPANY.siteUrl}/`);
+    expect(nodeOf('WebPage').url).toBe(`${COMPANY.siteUrl}/terms`);
+    expect(nodeOf('WebPage').name).toBe(document.title);
+    expect(nodeOf('WebPage').isPartOf['@id']).toBe(nodeOf('WebSite')['@id']);
+  });
+
+  it('una dirección que no existe no se indexa ni declara canonical', async () => {
+    await router.navigateByUrl('/no-existe');
+    language.set('es');
+    TestBed.tick();
+
+    expect(head('meta[name="robots"]')?.getAttribute('content')).toBe('noindex, nofollow');
+    expect(head('link[rel="canonical"]')).toBeNull();
+    expect(head('meta[property="og:url"]')).toBeNull();
+    expect(document.title).toContain('no encontrada');
+  });
+
+  it('al volver a una página real se indexa de nuevo', async () => {
+    await router.navigateByUrl('/no-existe');
+    TestBed.tick();
+    await router.navigateByUrl('/');
+    TestBed.tick();
+
+    expect(head('meta[name="robots"]')).toBeNull();
+    expect(head('link[rel="canonical"]')?.getAttribute('href')).toBe(`${COMPANY.siteUrl}/`);
+  });
+
+  it('el panel no se indexa y no lleva datos estructurados', async () => {
+    await router.navigateByUrl('/admin');
+    TestBed.tick();
+
+    expect(head('meta[name="robots"]')?.getAttribute('content')).toBe('noindex, nofollow');
+    expect(head('link[rel="canonical"]')).toBeNull();
+    expect(document.getElementById('bytek-json-ld')).toBeNull();
+  });
+
+  it('el home publica los servicios y las preguntas frecuentes del contenido', async () => {
+    await router.navigateByUrl('/');
+    TestBed.tick();
+    const graph = JSON.parse(document.getElementById('bytek-json-ld')?.textContent ?? '{}');
+    const types = graph['@graph'].map((node: { '@type': unknown }) => node['@type']);
+    const organization = graph['@graph'].find(
+      (node: { '@type': string }) => node['@type'] === 'Organization',
+    );
+
+    expect(types).toContain(['WebPage', 'FAQPage']);
+    expect(organization.hasOfferCatalog.itemListElement.length).toBeGreaterThan(0);
+  });
 });

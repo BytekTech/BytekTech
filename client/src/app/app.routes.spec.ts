@@ -49,9 +49,17 @@ describe('routes', () => {
     expect(TestBed.inject(Router).routerState.snapshot.url).toBe('/terms');
   });
 
-  it('manda al home cualquier dirección que no exista', async () => {
+  it('muestra la página de "no existe" en la dirección pedida, sin redirigir', async () => {
     await harness.navigateByUrl('/no-existe');
 
-    expect(TestBed.inject(Router).routerState.snapshot.url).toBe('/');
+    expect(TestBed.inject(Router).routerState.snapshot.url).toBe('/no-existe');
+    expect(harness.routeNativeElement?.querySelector('app-not-found')).not.toBeNull();
+    expect(harness.routeNativeElement?.querySelector('app-header')).not.toBeNull();
+  });
+
+  it('una subruta de los términos tampoco existe', async () => {
+    await harness.navigateByUrl('/terms/vieja');
+
+    expect(harness.routeNativeElement?.querySelector('app-not-found')).not.toBeNull();
   });
 });

@@ -1,0 +1,55 @@
+@use 'breakpoints' as bp;
+
+.not-found {
+  display: block;
+
+  .section-inner {
+    max-width: 52rem;
+  }
+}
+
+// La cifra a escala de cartel, con el punto parpadeante de la marca y debajo
+// el mismo número en bits: el error dicho en el idioma de la casa.
+.code {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-7);
+  font-family: var(--font-mono);
+}
+
+.code-number {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: clamp(5rem, 18vw, 9rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+.code-bit {
+  width: 0.14em;
+  height: 0.14em;
+  margin-left: 0.08em;
+  background: var(--accent);
+  animation: blink 1.06s infinite;
+}
+
+.code-bits {
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-mono);
+  color: var(--steel-light);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+@include bp.below(sm) {
+  .actions {
+    gap: var(--space-3);
+  }
+}

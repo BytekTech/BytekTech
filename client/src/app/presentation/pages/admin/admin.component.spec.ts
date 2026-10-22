@@ -1,150 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { Observable, of, throwError } from 'rxjs';
-import { AdminComponent } from './admin.component';
-import { AdminSessionGateway } from '../../../domain/gateways/admin-session.gateway';
-import { ContentEditorGateway } from '../../../domain/gateways/content-editor.gateway';
-import { ContentRepository } from '../../../domain/repositories/content.repository';
-import { ContentSection, SiteContent } from '../../../domain/models/site-content.model';
 import { ICON_MAX_BYTES, ICON_MIN_PIXELS } from '../../../domain/models/client-icon';
-import { FieldSpec, specFor } from './content-fields';
-
-/** Sesión siempre abierta: estos tests son sobre el formulario, no sobre el login. */
-class OpenSession extends AdminSessionGateway {
-  login(): Observable<void> {
-    return of(undefined);
-  }
-
-  logout(): Observable<void> {
-    return of(undefined);
-  }
-
-  isAuthenticated(): Observable<boolean> {
-    return of(true);
-  }
-}
-
-class FixedContent extends ContentRepository {
-  getContent(): Observable<SiteContent> {
-    return of(twoClients());
-  }
-}
-
-class AcceptingEditor extends ContentEditorGateway {
-  save<S extends ContentSection>(_section: S, items: SiteContent[S]): Observable<SiteContent[S]> {
-    return of(items);
-  }
-}
-
-/** El rechazo real del servidor: dice que algo no pasa, no dice qué. */
-class RejectingEditor extends ContentEditorGateway {
-  save<S extends ContentSection>(): Observable<SiteContent[S]> {
-    return throwError(() => ({ error: { error: 'INVALID_ITEM' } }));
-  }
-}
-
-/** Dos clientes: con uno solo el índice equivocado pasaría desapercibido. */
-function twoClients(): SiteContent {
-  return {
-    services: [],
-    metrics: [],
-    steps: [],
-    faqs: [],
-    clients: [
-      {
-        id: 'primera',
-        name: 'Primera',
-        since: 2022,
-        copy: {
-          es: { industry: 'Rubro uno', summary: 'Resumen uno.' },
-          en: { industry: 'Industry one', summary: 'Summary one.' },
-        },
-      },
-      {
-        id: 'segunda',
-        name: 'Segunda',
-        since: 2023,
-        copy: {
-          es: { industry: 'Rubro dos', summary: 'Resumen dos.' },
-          en: { industry: 'Industry two', summary: 'Summary two.' },
-        },
-      },
-    ],
-  };
-}
-
-async function renderAdmin(
-  editor: ContentEditorGateway = new AcceptingEditor(),
-): Promise<ComponentFixture<AdminComponent>> {
-  TestBed.configureTestingModule({
-    imports: [AdminComponent],
-    providers: [
-      provideZonelessChangeDetection(),
-      provideRouter([]),
-      { provide: AdminSessionGateway, useClass: OpenSession },
-      { provide: ContentRepository, useClass: FixedContent },
-      { provide: ContentEditorGateway, useValue: editor },
-    ],
-  });
-
-  const fixture = TestBed.createComponent(AdminComponent);
-  await fixture.whenStable();
-  return fixture;
-}
-
-function rowsOf(fixture: ComponentFixture<AdminComponent>): HTMLElement[] {
-  const host = fixture.nativeElement as HTMLElement;
-  return Array.from(host.querySelectorAll<HTMLElement>('.rows > li'));
-}
-
-/**
- * Los controles de una fila, en el orden en que la sección declara sus campos.
- * Para clientes: nombre, año, sitio, color, icono, rubro, resumen.
- */
-function controlsOf(row: HTMLElement): HTMLElement[] {
-  return Array.from(row.querySelectorAll<HTMLElement>('.field input, .field textarea'));
-}
-
-const NOMBRE = 0;
-const DESDE = 1;
-const SITIO = 2;
-
-function typeInto(control: HTMLElement, value: string): void {
-  const field = control as HTMLInputElement | HTMLTextAreaElement;
-  field.value = value;
-  field.dispatchEvent(new Event('input'));
-}
-
-function leave(control: HTMLElement): void {
-  control.dispatchEvent(new Event('blur'));
-}
-
-function iconField(): FieldSpec {
-  const field = specFor('clients').fields.find((candidate) => candidate.key === 'icon');
-  if (!field) {
-    throw new Error('La sección de clientes perdió el campo del icono');
-  }
-  return field;
-}
-
-/** Un PNG con la cabecera real: alcanza para que se le lea la medida. */
-function pngFile(side: number, padding = 0): File {
-  const bytes = new Uint8Array(24 + padding);
-  bytes.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0);
-  bytes[11] = 13;
-  bytes.set([0x49, 0x48, 0x44, 0x52], 12);
-  bytes[18] = (side >>> 8) & 0xff;
-  bytes[19] = side & 0xff;
-  bytes[22] = (side >>> 8) & 0xff;
-  bytes[23] = side & 0xff;
-  return new File([bytes], 'logo.png', { type: 'image/png' });
-}
-
-/** El control de archivo, sin depender de poder fabricar un FileList real. */
-function fileInput(file?: File): HTMLInputElement {
-  return { files: file ? [file] : [], value: 'logo.png' } as unknown as HTMLInputElement;
-}
+import {
+  controlsOf,
+  DESDE,
+  dropOf,
+  fileInput,
+  iconField,
+  leave,
+  NOMBRE,
+  pngFile,
+  RejectingEditor,
+  renderAdmin,
+  rowsOf,
+  SITIO,
+  typeInto,
+} from './admin.testing';
 
 describe('AdminComponent', () => {
   /*
@@ -245,7 +114,7 @@ describe('AdminComponent', () => {
   });
 
   it('marca en rojo el campo que falta cuando el servidor rechaza', async () => {
-    const fixture = await renderAdmin(new RejectingEditor());
+    const fixture = await renderAdmin({ editor: new RejectingEditor() });
     const component = fixture.componentInstance;
 
     component.add();
@@ -296,7 +165,7 @@ describe('AdminComponent', () => {
   });
 
   it('dice qué le falta al campo, no sólo que algo falta', async () => {
-    const fixture = await renderAdmin(new RejectingEditor());
+    const fixture = await renderAdmin({ editor: new RejectingEditor() });
     const component = fixture.componentInstance;
 
     component.add();
@@ -313,7 +182,7 @@ describe('AdminComponent', () => {
   });
 
   it('ata el aviso al control para que lo anuncie el lector de pantalla', async () => {
-    const fixture = await renderAdmin(new RejectingEditor());
+    const fixture = await renderAdmin({ editor: new RejectingEditor() });
     const component = fixture.componentInstance;
 
     component.add();
@@ -329,7 +198,7 @@ describe('AdminComponent', () => {
   });
 
   it('deja de marcar el campo en cuanto se completa', async () => {
-    const fixture = await renderAdmin(new RejectingEditor());
+    const fixture = await renderAdmin({ editor: new RejectingEditor() });
 
     fixture.componentInstance.add();
     await fixture.whenStable();
@@ -411,6 +280,60 @@ describe('AdminComponent', () => {
     expect(component.iconRejection(0)).toBeNull();
   });
 
+  it('guarda el icono que se suelta sobre el campo', async () => {
+    const fixture = await renderAdmin();
+    const component = fixture.componentInstance;
+
+    await component.dropIcon(0, iconField(), dropOf(pngFile(ICON_MIN_PIXELS)));
+    await fixture.whenStable();
+
+    expect(component.items()[0]['icon']).toMatch(/^data:image\/png;base64,/);
+  });
+
+  it('revisa lo que se suelta igual que lo que se elige', async () => {
+    const fixture = await renderAdmin();
+    const component = fixture.componentInstance;
+
+    await component.dropIcon(0, iconField(), dropOf(pngFile(ICON_MIN_PIXELS - 1)));
+    await fixture.whenStable();
+
+    expect(component.items()[0]['icon']).toBeUndefined();
+    expect(component.iconRejection(0)).toContain(`${ICON_MIN_PIXELS}px`);
+  });
+
+  it('resalta sólo el campo sobre el que se arrastra un archivo', async () => {
+    const fixture = await renderAdmin();
+    const component = fixture.componentInstance;
+
+    component.dragOverIcon(1, dropOf(pngFile(ICON_MIN_PIXELS), 'dragover'));
+
+    expect(component.isIconDropTarget(1)).toBeTrue();
+    expect(component.isIconDropTarget(0)).toBeFalse();
+  });
+
+  it('no se ofrece a recibir un texto arrastrado', async () => {
+    const fixture = await renderAdmin();
+    const component = fixture.componentInstance;
+    const transfer = new DataTransfer();
+    transfer.setData('text/plain', 'logo');
+
+    component.dragOverIcon(0, new DragEvent('dragover', { dataTransfer: transfer, cancelable: true }));
+
+    expect(component.isIconDropTarget(0)).toBeFalse();
+  });
+
+  // Soltado fuera de un campo, el navegador abría el archivo en la pestaña y
+  // se perdía el borrador sin publicar.
+  it('no deja que un archivo soltado fuera del campo reemplace al panel', async () => {
+    const fixture = await renderAdmin();
+    const stray = dropOf(pngFile(ICON_MIN_PIXELS));
+
+    document.body.dispatchEvent(stray);
+
+    expect(stray.defaultPrevented).toBeTrue();
+    expect(fixture.componentInstance.items()[0]['icon']).toBeUndefined();
+  });
+
   it('deja sacar el icono ya puesto', async () => {
     const fixture = await renderAdmin();
     const component = fixture.componentInstance;
@@ -424,7 +347,7 @@ describe('AdminComponent', () => {
   });
 
   it('señala el idioma al que le falta un campo, aunque no esté a la vista', async () => {
-    const fixture = await renderAdmin(new RejectingEditor());
+    const fixture = await renderAdmin({ editor: new RejectingEditor() });
     const component = fixture.componentInstance;
 
     component.add();

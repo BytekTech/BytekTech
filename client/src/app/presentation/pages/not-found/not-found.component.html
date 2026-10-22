@@ -1,0 +1,26 @@
+<section class="not-found">
+  <div class="section-inner">
+    <!-- El número grande es decorativo: el código ya lo dice el antetítulo. -->
+    <div class="code" aria-hidden="true">
+      <span class="code-number">404<span class="code-bit"></span></span>
+      <span class="code-bits">{{ bits }}</span>
+    </div>
+
+    <header class="section-head">
+      <p class="eyebrow">
+        <span class="eyebrow-slash" aria-hidden="true">//</span>
+        {{ t().notFound.eyebrow }}
+      </p>
+      <h1 class="section-title">{{ t().notFound.title }}</h1>
+      <p class="section-subtitle">{{ t().notFound.intro }}</p>
+    </header>
+
+    <div class="actions">
+      <a class="btn btn-primary" [href]="homePath">{{ t().notFound.home }}</a>
+      <a class="btn btn-ghost" [href]="contactHref">
+        {{ t().notFound.contact }}
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>

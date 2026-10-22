@@ -83,6 +83,16 @@ app.post('/api/admin/logout', handleLogout);
 app.get('/api/admin/session', handleSession);
 
 /**
+ * El panel no se bloquea en robots.txt: el buscador tiene que poder entrar
+ * para leer que no se indexa. Además de la meta etiqueta de la página, va en
+ * la cabecera, que se respeta aunque el render falle.
+ */
+app.use('/admin', (_req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  next();
+});
+
+/**
  * Serve static files from /browser
  */
 app.use(

@@ -8,6 +8,7 @@ import {
   makeStateKey,
   PLATFORM_ID,
   REQUEST,
+  RESPONSE_INIT,
   signal,
   TransferState,
 } from '@angular/core';
@@ -38,6 +39,7 @@ export class LanguageService {
   private readonly router = inject(Router);
   private readonly transferState = inject(TransferState);
   private readonly request = inject(REQUEST, { optional: true });
+  private readonly response = inject(RESPONSE_INIT, { optional: true });
 
   /**
    * El idioma es una preferencia de quien lee, no un tramo de la URL: la misma
@@ -103,7 +105,23 @@ export class LanguageService {
       return this.transferState.get(LANG_KEY, browserLang());
     }
     const header = this.request?.headers.get('accept-language') ?? '';
-    return langFromAcceptLanguage(header) ?? DEFAULT_LANG;
+    const lang = langFromAcceptLanguage(header) ?? DEFAULT_LANG;
+    this.declareNegotiation(lang);
+    return lang;
+  }
+
+  /**
+   * La misma URL responde en un idioma u otro según la cabecera del visitante.
+   * Hay que decirlo en la respuesta: sin `Vary`, una caché intermedia le sirve
+   * a todos el idioma del primero que pasó, y los buscadores no tienen cómo
+   * saber que la página cambia con el idioma.
+   */
+  private declareNegotiation(lang: Lang): void {
+    const headers = this.response?.headers;
+    if (headers instanceof Headers) {
+      headers.append('Vary', 'Accept-Language');
+      headers.set('Content-Language', lang);
+    }
   }
 }
 

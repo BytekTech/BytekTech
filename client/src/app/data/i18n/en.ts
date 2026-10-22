@@ -5,6 +5,7 @@ export const EN: Translations = {
     title: 'Bytek Technology — Custom software engineering',
     description:
       'We design and build custom software for companies: web platforms, digital products, internal systems and cloud infrastructure. From MVP to production.',
+    imageAlt: 'bytek — Custom software engineering: web, product, cloud and data',
   },
   skipToContent: 'Skip to content',
   nav: {
@@ -100,6 +101,18 @@ export const EN: Translations = {
       'The rules for using this site, what we do with the data you leave us, and which law applies if something is disputed.',
     updatedLabel: 'Last updated',
     back: 'Back to home',
+  },
+  notFound: {
+    meta: {
+      title: 'Page not found — Bytek Technology',
+      description: 'The address you are looking for does not exist on the Bytek Technology site.',
+    },
+    eyebrow: 'Error 404',
+    title: 'This page does not exist',
+    intro:
+      'The address may be mistyped or the page may have moved. Whatever you were looking for is most likely on the home page.',
+    home: 'Back to home',
+    contact: 'Get in touch',
   },
   footer: {
     tagline: 'Custom technology solutions, from idea to production.',

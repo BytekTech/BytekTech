@@ -182,7 +182,17 @@
                       </span>
                     }
                     @case ('image') {
-                      <span class="icon-field">
+                      <!--
+                        Soltar el archivo es un atajo, no la única vía: el
+                        selector sigue ahí para quien usa teclado o lector.
+                      -->
+                      <span
+                        class="icon-field"
+                        [class.drop-target]="isIconDropTarget(row)"
+                        (dragover)="dragOverIcon(row, $event)"
+                        (dragleave)="leaveIconDrop($event)"
+                        (drop)="dropIcon(row, field, $event)"
+                      >
                         <!--
                           Siempre con `<img>`: ahí el navegador no ejecuta lo
                           que pueda traer un SVG. Incrustarlo en el documento
@@ -197,6 +207,7 @@
                           [accept]="iconAccept"
                           (change)="pickIcon(row, field, $any($event.target))"
                         />
+                        <span class="drop-hint" aria-hidden="true">o arrastralo acá</span>
                         @if (valueOf(item, field)) {
                           <button type="button" class="ghost" (click)="clearIcon(row, field)">
                             Quitar
